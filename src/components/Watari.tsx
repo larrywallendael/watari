@@ -25,7 +25,7 @@ const I = {
 export const Icon = ({ d, className = "w-4 h-4" }: { d: React.ReactNode; className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>{d}</svg>
 );
-const CH_ICON: Record<ChannelId, React.ReactNode> = { app_push: I.push, kate_chat: I.chat, email: I.mail, voice_call: I.phone, advisor: I.user };
+const CH_ICON: Record<ChannelId, React.ReactNode> = { push: I.push, whatsapp: I.chat, mail: I.mail, call: I.phone, messenger: I.chat, browser: I.user };
 
 const STATUS: Record<string, { label: string; cls: string; tip: string }> = {
   deliver: { label: "Delivered", cls: "bg-emerald-50 text-emerald-700 border-emerald-200", tip: "WATARI speaks: right moment, right channel, pre-filled actions." },
@@ -58,7 +58,7 @@ export default function Watari() {
   }, []);
   useEffect(() => { load(); }, [load]);
   useEffect(() => {
-    try { if (!localStorage.getItem("watari-toured")) setTimeout(() => setTour(true), 700); } catch {}
+    if (new URLSearchParams(location.search).get("build")) setBuilder(true);
   }, []);
 
   const run = useCallback(async (id: string) => {
@@ -104,7 +104,7 @@ export default function Watari() {
             <div className="w-8 h-8 rounded-lg bg-[var(--navy)] text-white grid place-items-center"><Icon d={I.bolt} /></div>
             <div className="leading-tight">
               <div className="font-extrabold tracking-[0.18em] text-[var(--navy)]">WATARI</div>
-              <div className="text-[11px] text-[var(--muted)] -mt-0.5">KBC moment engine · knows when to speak, and when not to</div>
+              <div className="text-[11px] text-[var(--muted)] -mt-0.5">Agent lab · build customers, inspect decisions, run evals · <a href="/" className="underline">back to the live demo</a></div>
             </div>
           </div>
           <div className="flex-1" />
@@ -151,7 +151,7 @@ export default function Watari() {
           <div className="flex gap-2 mb-5 flex-wrap">
             {(Object.keys(CHANNELS) as ChannelId[]).map((c) => {
               const on = decision?.channel === c;
-              const noVoice = c === "voice_call" && persona && !persona.consent.voice;
+              const noVoice = c === "call" && persona && !persona.consent.voice && !persona.consent.emergency;
               return (
                 <div key={c} title={noVoice ? "No voice consent: channel excluded" : CHANNELS[c].label}
                   className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border transition ${on ? "bg-[var(--navy)] text-white border-[var(--navy)]" : noVoice ? "text-slate-300 border-slate-100 line-through" : "text-[var(--muted)] border-[var(--line)]"}`}>

@@ -2,7 +2,7 @@
 
 > KBC answers 80 million questions. WATARI answers the ones customers never had to ask, and knows when to stay quiet.
 
-Tectonic Hackathon 2026 · KBC track. Everything runs on **synthetic data**. There are no real customers and no real KBC systems.
+Tectonic Hackathon 2026 · KBC track. Live demo: `/` (wireframe + live agent log + verdict), agent lab: `/lab` (build a customer, evals). Everything runs on **synthetic data**. There are no real customers and no real KBC systems.
 
 ## What it is
 WATARI is an orchestration agent that sits between KBC's signals (bank, insurance, app) and its channels (push, Kate, mail, voice, advisor). For each customer it decides:
@@ -27,7 +27,7 @@ The UI is only a window onto the agent. The **agent terminal** at the bottom str
 If the LLM fails or no key is set, WATARI falls back to template copy. The decision never depends on the LLM.
 
 ## Evals
-`GET /api/evals` runs 14 behavioural cases: the seed personas, perturbations (consent off, weak evidence, owned product), unseen customers (business start, car + overdraft, travel) and safety cases (Art. 9 only, stale signals). They're also visible in the app under **Evals**.
+`GET /api/evals` runs 17 behavioural cases (the 7 stories,: the seed personas, perturbations (consent off, weak evidence, owned product), unseen customers (business start, car + overdraft, travel) and safety cases (Art. 9 only, stale signals). They're also visible in the app under **Evals**.
 
 ## Run locally
 ```bash

@@ -51,34 +51,37 @@ export function eligibleBundle(p: Persona, ev: EventDef, allowCommercial: boolea
   return { items, dropped };
 }
 
-export function pickChannel(p: Persona, ev: EventDef): { channel: ChannelId; scores: Record<string, number>; excluded: string[] } {
+export function pickChannel(p: Persona, ev: EventDef, used: Signal[]): { channel: ChannelId; scores: Record<string, number>; excluded: string[] } {
   const excluded: string[] = [];
-  const fit: Record<ChannelId, number> = {
-    app_push: ev.sensitivity === "critical" ? 0.2 : 1,
-    kate_chat: ev.sensitivity === "normal" ? 0.8 : 0.9,
-    email: 0.5,
-    voice_call: ev.urgency >= 0.75 && ev.sensitivity === "normal" ? 1 : 0.3,
-    advisor: ev.sensitivity === "critical" ? 1.2 : 0.4,
-  };
+  const liveCheckout = used.some((s) => s.category && SIGNAL_CATEGORIES[s.category]?.live);
   const scores: Record<string, number> = {};
   (Object.keys(CHANNELS) as ChannelId[]).forEach((c) => {
-    if (c === "voice_call" && !p.consent.voice) { excluded.push("voice_call (no voice consent)"); return; }
-    scores[c] = Math.round((p.channelPrefs[c] ?? 0) * fit[c] * 100) / 100;
+    if (c === "call" && !p.consent.voice && !(ev.sensitivity === "emergency" && p.consent.emergency)) { excluded.push("call (no voice consent)"); return; }
+    if (c === "browser" && !liveCheckout) { excluded.push("browser (customer not in a checkout)"); return; }
+    let fit = ev.channelFit[c] ?? 0.1;
+    if (c === "browser" && liveCheckout) fit *= 1.6;
+    scores[c] = Math.round((p.channelPrefs[c] ?? 0.3) * fit * 100) / 100;
   });
-  const channel = (Object.entries(scores).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "kate_chat") as ChannelId;
+  const channel = (Object.entries(scores).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "push") as ChannelId;
   return { channel, scores, excluded };
 }
 
-// Demo clock is Brussels local time (DEMO_NOW = 18:20), timezone-independent on the server.
-export const DEMO_HOUR = 18 + 20 / 60;
-export function nextWindow(p: Persona): string {
-  const hours = [...p.appOpenHours].sort((a, b) => a - b);
-  const next = hours.find((x) => x > DEMO_HOUR);
-  const pad = (n: number) => String(n).padStart(2, "0") + ":00";
-  if (next === undefined) return `Tomorrow ${pad(hours[0] ?? 9)}`;
-  return `Today ${pad(next)}`;
+export function inQuietHours(hour: number) {
+  const [from, to] = RULES.quietHours;
+  return hour >= from || hour < to;
 }
 
 export function bundleItems(ids: string[]): BundleItem[] {
   return ids.map((id) => ({ productId: id, title: CATALOG[id].title, prefill: "" }));
+}
+
+// Demo clock is Brussels local time (18:20 unless the persona's moment says otherwise).
+export const DEMO_HOUR = 18 + 20 / 60;
+export function nextWindow(p: Persona): string {
+  const now = p.localHour ?? DEMO_HOUR;
+  const hours = [...p.appOpenHours].sort((a, b) => a - b);
+  const next = hours.find((x) => x > now);
+  const pad = (n: number) => String(n).padStart(2, "0") + ":00";
+  if (next === undefined) return `Tomorrow ${pad(hours[0] ?? 9)}`;
+  return `Today ${pad(next)}`;
 }

@@ -20,7 +20,7 @@ export default function Builder({ onClose, onCreated }: { onClose: () => void; o
   const [name, setName] = useState("Noor Vermeulen");
   const [age, setAge] = useState(29);
   const [city, setCity] = useState("Brussel");
-  const [consent, setConsent] = useState({ life_events: true, cross_sell: true, voice: false, marketing: true });
+  const [consent, setConsent] = useState({ life_events: true, cross_sell: true, voice: false, marketing: true, emergency: false });
   const [contacts, setContacts] = useState(0);
   const [hours, setHours] = useState("8, 20");
   const [signals, setSignals] = useState<Sig[]>(PRESETS[0].signals);
@@ -33,7 +33,7 @@ export default function Builder({ onClose, onCreated }: { onClose: () => void; o
     setBusy(true); setErr(null);
     const body = {
       name, age, city, segment: "Custom", bio: `Custom customer built in the WATARI sandbox.`, products: ["current_account"], consent,
-      channelPrefs: { app_push: 0.8, kate_chat: 0.6, email: 0.5, voice_call: 0.5, advisor: 0.3 },
+      channelPrefs: { push: 0.8, whatsapp: 0.6, mail: 0.5, call: 0.4, messenger: 0.3, browser: 0.5 },
       appOpenHours: hours.split(/[ ,]+/).map(Number).filter((n) => Number.isInteger(n) && n >= 0 && n < 24).slice(0, 8),
       contacts30d: contacts,
       signals: signals.filter((s) => s.text.trim()).map((s) => ({ date: s.date, source: s.source, text: s.text, ...(s.merchant ? { merchant: s.merchant } : {}), ...(s.amount && !isNaN(+s.amount) ? { amount: +s.amount } : {}), ...(s.category ? { category: s.category } : {}) })),

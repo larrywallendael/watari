@@ -3,7 +3,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { CATALOG, CHANNELS, EVENTS, RULES, SIGNAL_CATEGORIES } from "./catalog";
-import { bundleItems, detect, eligibleBundle, filterSignals, nextWindow, pickChannel } from "./engine";
+import { bundleItems, detect, eligibleBundle, filterSignals, inQuietHours, nextWindow, pickChannel } from "./engine";
 import type { Decision, Persona, Signal, TraceEvent } from "./types";
 
 export const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5";
@@ -171,11 +171,36 @@ export async function runWatari(p: Persona, emitRaw: (e: TraceEvent) => void, op
   for (const d of dropped) emit({ kind: "rule", label: `drop ${d.id}`, detail: d.reason });
   emit({ kind: "pass", label: `Bundle allowlist: ${items.length} item(s)`, detail: items.join(", ") });
 
-  const ch = pickChannel(p, top.event);
+  const ch = pickChannel(p, top.event, used);
   for (const x of ch.excluded) emit({ kind: "block", label: `Channel excluded: ${x}` });
-  emit({ kind: "tool", label: "engine.pick_channel()", detail: Object.entries(ch.scores).map(([k, v]) => `${CHANNELS[k as keyof typeof CHANNELS].short}=${v}`).join("  ") });
-  const sendAt = urgent || ch.channel === "advisor" ? "Now" : nextWindow(p);
-  emit({ kind: "pass", label: `Channel: ${CHANNELS[ch.channel].label} · send ${sendAt}`, detail: urgent ? "urgent" : `next app-open window from habits [${p.appOpenHours.join(", ")}h]` });
+  emit({ kind: "tool", label: "engine.pick_channel()", detail: Object.entries(ch.scores).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k}=${v}`).join("  ") });
+  const hour = p.localHour ?? 18.3;
+  const hh = `${String(Math.floor(hour)).padStart(2, "0")}:${String(Math.round((hour % 1) * 60)).padStart(2, "0")}`;
+  let sendAt: string;
+  if (top.event.sensitivity === "emergency") {
+    if (inQuietHours(hour) && p.consent.emergency) {
+      sendAt = "Now";
+      emit({ kind: "rule", label: `Quiet Hours active (${hh}) · BROKEN on purpose`, detail: "emergency + customer allowed 'wake me for emergencies'" });
+    } else if (inQuietHours(hour)) {
+      sendAt = "07:00, card frozen meanwhile";
+      blockedBy.push("quiet hours");
+      emit({ kind: "block", label: `Quiet Hours (${hh}): no wake-up consent`, detail: "card protected silently, customer told at 07:00" });
+    } else sendAt = "Now";
+  } else if (top.event.timing) {
+    sendAt = top.event.timing;
+    emit({ kind: "rule", label: `Timing rule for ${top.event.label.toLowerCase()}`, detail: sendAt });
+  } else if (ch.channel === "browser") {
+    sendAt = "Now, at checkout";
+    emit({ kind: "rule", label: "Customer is deciding right now → speak in the moment of decision" });
+  } else if (inQuietHours(hour)) {
+    sendAt = nextWindow({ ...p, localHour: 7 });
+    blockedBy.push("quiet hours");
+    emit({ kind: "block", label: `Quiet Hours (${hh}) → wait`, detail: `deliver ${sendAt}` });
+  } else {
+    sendAt = urgent ? "Now" : nextWindow(p);
+  }
+  emit({ kind: "pass", label: `Channel: ${CHANNELS[ch.channel].label} · ${sendAt}`, detail: urgent ? "high urgency" : `habits: opens app at [${p.appOpenHours.join(", ")}h]` });
+  if (ch.channel === "messenger") emit({ kind: "rule", label: "Tone rule: message comes from the customer, not the bank", detail: "draft only, customer presses Send" });
 
   emit({ kind: "phase", label: "ACT", detail: "compose, validate, deliver" });
   const ctx = { moment: top.event.label, confidence: top.confidence, mode, channel: CHANNELS[ch.channel].label, evidence: top.evidence.map((e) => ({ date: e.date, what: e.text, merchant: e.merchant })) };

@@ -1,5 +1,5 @@
 export type Source = "bank" | "insurance" | "app" | "external";
-export type ChannelId = "app_push" | "kate_chat" | "email" | "voice_call" | "advisor";
+export type ChannelId = "push" | "whatsapp" | "mail" | "call" | "messenger" | "browser";
 
 export interface Signal {
   id: string;
@@ -16,6 +16,7 @@ export interface Consent {
   cross_sell: boolean; // may KBC propose products
   voice: boolean; // may Kate call
   marketing: boolean; // promotional push allowed
+  emergency?: boolean; // "wake me for emergencies": may break Quiet Hours
 }
 
 export interface Persona {
@@ -30,6 +31,8 @@ export interface Persona {
   channelPrefs: Record<ChannelId, number>; // 0..1 learned affinity
   appOpenHours: number[]; // hours the customer usually opens KBC Mobile
   contacts30d: number; // proactive contacts already sent in last 30 days
+  localHour?: number; // customer local time for this moment (demo clock)
+  scenario?: string; // wireframe scenario this persona drives
   custom?: boolean;
   signals: Signal[];
 }

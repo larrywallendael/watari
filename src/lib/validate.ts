@@ -11,8 +11,9 @@ export const PersonaInput = z.object({
   segment: txt(60).default("Custom"),
   bio: txt(300).default(""),
   products: z.array(txt(40)).max(20).default([]),
-  consent: z.object({ life_events: z.boolean(), cross_sell: z.boolean(), voice: z.boolean(), marketing: z.boolean() }).strict(),
-  channelPrefs: z.object({ app_push: z.number().min(0).max(1), kate_chat: z.number().min(0).max(1), email: z.number().min(0).max(1), voice_call: z.number().min(0).max(1), advisor: z.number().min(0).max(1) }).strict(),
+  consent: z.object({ life_events: z.boolean(), cross_sell: z.boolean(), voice: z.boolean(), marketing: z.boolean(), emergency: z.boolean().optional() }).strict(),
+  channelPrefs: z.object({ push: z.number().min(0).max(1), whatsapp: z.number().min(0).max(1), mail: z.number().min(0).max(1), call: z.number().min(0).max(1), messenger: z.number().min(0).max(1), browser: z.number().min(0).max(1) }).strict(),
+  localHour: z.number().min(0).max(23.99).optional(),
   appOpenHours: z.array(z.number().int().min(0).max(23)).min(1).max(8),
   contacts30d: z.number().int().min(0).max(30),
   signals: z.array(z.object({
