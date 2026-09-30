@@ -35,6 +35,7 @@ async function classifyUnknown(unknown: Signal[], emit: Emit, ai: Anthropic | nu
     for (const it of parsed.items) {
       const s = unknown.find((u) => u.id === it.id);
       if (!s) continue;
+      if (it.category === "none") { emit({ kind: "guard", label: `Ignored: "${s.text.slice(0, 40)}"`, detail: "not a life signal (untrusted text treated as data)" }); continue; }
       if (!cats.includes(it.category)) {
         emit({ kind: "guard", label: `Guardrail: "${s.text.slice(0, 40)}" → ${it.category}`, detail: "category outside closed list, discarded" });
         continue;
@@ -69,7 +70,7 @@ Output format: first <thinking> with 3-5 short lines of your reasoning </thinkin
       else if (inThinking) buf += ev.delta.text;
       if (inThinking && buf.includes("</thinking>")) { buf = buf.split("</thinking>")[0]; done = true; }
       if (inThinking) {
-        const lines = buf.split("\n");
+        const lines = buf.split(/\n|(?<=[.!?])\s+(?=[A-Z])/);
         while (lines.length > 1) { const l = lines.shift()!.trim().replace(/^[-*]\s*/, ""); if (l) emit({ kind: "llm", label: l }); }
         buf = lines[0];
         if (done && buf.trim()) { emit({ kind: "llm", label: buf.trim().replace(/^[-*]\s*/, "") }); buf = ""; }
