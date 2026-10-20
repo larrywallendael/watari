@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<base href="/app/">
+<title>WATARI · CFO agent</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cdefs%3E%3CradialGradient id=%22g%22%3E%3Cstop offset=%22.14%22 stop-color=%22%23fff%22/%3E%3Cstop offset=%22.34%22 stop-color=%22%237fd8ff%22/%3E%3Cstop offset=%22.7%22 stop-color=%22%231e8bff%22/%3E%3Cstop offset=%221%22 stop-color=%22%231f5fe0%22/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2215%22 fill=%22url(%23g)%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0b3b7a;--navy-d:#062a5b;--cyan:#00aeef;--cyan-soft:#e3f6fd;--cyan-line:#bfe9fa;
+  --ink:#0b1f33;--ink-2:#34435a;--muted:#5a6b7d;--faint:#8a97a8;--line:#e3e9f1;--line-2:#d3dce8;
+  --bg:#f4f7fb;--ok:#12b76a;--ok-d:#067647;--ok-soft:#e9f9f0;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;--ease:cubic-bezier(.2,.8,.2,1);
+  --sh-1:0 1px 2px rgba(11,31,51,.06),0 2px 6px rgba(11,31,51,.05);--sh-2:0 10px 30px rgba(6,42,91,.12),0 2px 6px rgba(6,42,91,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:#e6ecf4;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+svg.i{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ---------- step frames ---------- */
+#frames{position:fixed;inset:0}
+#frames iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#e6ecf4;opacity:0;transition:opacity .38s var(--ease)}
+#frames iframe.on{opacity:1}
+#hot{position:fixed;left:0;right:0;bottom:0;height:10px;z-index:40}
+#prog{position:fixed;left:0;bottom:0;height:2px;z-index:41;background:linear-gradient(90deg,var(--cyan),var(--navy));opacity:.55;transition:width .5s var(--ease)}
+
+/* ---------- tracker (d2 phase rail, slimmed) ---------- */
+#dock{position:fixed;left:50%;bottom:14px;z-index:50;transform:translate(-50%,12px);opacity:0;pointer-events:none;
+  transition:opacity .35s var(--ease),transform .35s var(--ease)}
+#dock.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.bar{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid var(--line);border-radius:14px;padding:4px;box-shadow:var(--sh-2)}
+.bar .mk{width:22px;height:22px;border-radius:50%;margin:0 6px 0 5px;flex:none;
+  background:radial-gradient(circle at 50% 50%,#fff 0 14%,#7fd8ff 34%,#1e8bff 70%,#1f5fe0 100%);box-shadow:0 0 0 2px #fff,0 0 0 3px var(--line),0 3px 10px rgba(0,174,239,.3)}
+.bar .sep{width:1px;height:20px;background:var(--line);margin:0 3px}
+.st{display:flex;align-items:center;gap:7px;border:0;background:none;height:30px;padding:0 11px 0 5px;border-radius:9px;font-size:11.5px;font-weight:600;color:var(--faint);white-space:nowrap;transition:background .25s,color .25s}
+.st .n{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:600 10px var(--mono);background:var(--bg);color:var(--faint);border:1px solid var(--line);transition:all .25s}
+.st .n svg{width:11px;height:11px;stroke-width:3}
+.st small{font-weight:500;color:inherit;opacity:.75}
+.st:hover{color:var(--navy);background:var(--bg)}
+.st.done{color:var(--ink-2)}
+.st.done .n{background:var(--ok);border-color:var(--ok);color:#fff}
+.st.cur{background:var(--navy-d);color:#fff}
+.st.cur .n{background:#fff;color:var(--navy-d);border-color:#fff}
+.st.cur small{opacity:.7}
+.ib{width:30px;height:30px;border-radius:9px;border:1px solid transparent;background:none;display:grid;place-items:center;color:var(--ink-2)}
+.ib:hover{border-color:var(--line);background:#fff;color:var(--navy)}
+.ib:disabled{opacity:.3;cursor:default;background:none;border-color:transparent}
+.ib svg{width:15px;height:15px}
+.keys{font:500 9.5px var(--mono);color:var(--faint);text-align:center;margin-top:6px;letter-spacing:.02em;text-shadow:0 1px 0 rgba(255,255,255,.8)}
+
+/* ---------- hidden "your own use case" ---------- */
+#own{position:fixed;left:9px;bottom:9px;z-index:45;width:9px;height:9px;border-radius:50%;border:0;padding:0;
+  background:var(--line-2);opacity:.35;transition:opacity .25s,transform .25s,background .25s}
+#own:hover,#own:focus-visible{opacity:1;transform:scale(1.35);background:var(--cyan);outline:none}
+#own::after{content:attr(data-tip);position:absolute;left:16px;bottom:-4px;font:600 10.5px Inter,system-ui,sans-serif;color:var(--ink-2);background:#fff;border:1px solid var(--line);
+  border-radius:7px;padding:3px 8px;white-space:nowrap;box-shadow:var(--sh-1);opacity:0;transform:translateX(-4px);transition:opacity .2s,transform .2s;pointer-events:none}
+#own:hover::after{opacity:1;transform:none}
+#veil{position:fixed;inset:0;z-index:80;background:rgba(11,31,51,.28);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:none;place-items:center}
+#veil.on{display:grid;animation:fade .25s var(--ease)}
+.modal{width:min(560px,calc(100vw - 32px));background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 30px 80px rgba(6,42,91,.25);padding:22px 22px 18px;animation:pop .32s var(--ease) both}
+.modal .hd{display:flex;align-items:center;gap:12px}
+.modal .hd .mk{width:34px;height:34px;border-radius:50%;flex:none;background:radial-gradient(circle at 50% 50%,#fff 0 14%,#7fd8ff 34%,#1e8bff 70%,#1f5fe0 100%);box-shadow:0 0 0 3px #fff,0 0 0 4px var(--line),0 4px 14px rgba(0,174,239,.35)}
+.modal .hd .k{font:600 9.5px var(--mono);letter-spacing:.08em;color:var(--cyan);text-transform:uppercase}
+.modal h3{font-size:18px;font-weight:800;letter-spacing:-.01em;margin-top:1px}
+.modal h3 span{color:var(--faint);font-weight:600}
+.modal .x{margin-left:auto;align-self:flex-start}
+.modal p{font-size:12.5px;color:var(--muted);line-height:1.55;margin:14px 0 10px}
+.modal textarea{width:100%;height:120px;resize:none;border:1px dashed var(--line-2);border-radius:12px;background:var(--bg);padding:12px 14px;font:500 12.5px Inter,system-ui,sans-serif;color:var(--faint);line-height:1.5}
+.modal .ft{display:flex;align-items:center;gap:8px;margin-top:12px}
+.modal .chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--cyan-soft);border:1px solid var(--cyan-line);color:#036b95}
+.modal .chip svg{width:12px;height:12px}
+.modal .go{margin-left:auto;display:flex;align-items:center;gap:7px;height:34px;padding:0 14px;border-radius:10px;border:0;background:var(--navy-d);color:#fff;font-size:12px;font-weight:600;opacity:.35;cursor:not-allowed}
+.modal .go svg{width:14px;height:14px}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:0s!important;animation-duration:0s!important}}
+</style>
+</head>
+<body>
+<div id="frames"></div>
+<div id="hot"></div>
+<div id="prog"></div>
+
+<nav id="dock" aria-label="Pitch steps">
+  <div class="bar">
+    <span class="mk" title="WATARI"></span>
+    <button class="ib" id="prev" title="Previous step (PageUp or [)"></button>
+    <div id="steps" style="display:flex;gap:2px"></div>
+    <button class="ib" id="next" title="Next step (PageDown or ])"></button>
+    <span class="sep"></span>
+    <button class="ib" id="fs" title="Full screen"></button>
+  </div>
+  <div class="keys">PgDn / PgUp or ] / [ to move · click a step to jump</div>
+</nav>
+
+<button id="own" data-tip="Your own use case" aria-label="Your own use case"></button>
+<div id="veil" role="dialog" aria-modal="true" aria-labelledby="ownT">
+  <div class="modal">
+    <div class="hd">
+      <span class="mk"></span>
+      <div><div class="k">WATARI · build your own</div><h3 id="ownT">Your own use case <span>· coming soon</span></h3></div>
+      <button class="ib x" id="ownX" title="Close (Esc)"></button>
+    </div>
+    <p>Describe a CFO job in one or two lines. WATARI will plan it, pick the tools it needs and run it live, with the same guardrails you saw in the demos.</p>
+    <textarea disabled placeholder="e.g. Every Friday, check which customers are more than 30 days late and draft a reminder for each one."></textarea>
+    <div class="ft"><span class="chip" id="ownC"></span><button class="go" disabled id="ownGo"></button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+const I={
+  l:'<path d="m15 18-6-6 6-6"/>',r:'<path d="m9 18 6-6-6-6"/>',ok:'<path d="M20 6 9 17l-5-5"/>',x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  fs:'<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>',
+  sp:'<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+  go:'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>'
+};
+const svg=k=>`<svg class="i" viewBox="0 0 24 24">${I[k]}</svg>`;
+const $=s=>document.querySelector(s);
+
+/* the pitch flow (see design/05-handoff/BUILD-2.0.md) */
+const STEPS=[
+  {t:'Slide',s:'Cover',     url:'/app/slides/01-cover.html'},
+  {t:'Demo',s:'Payroll call',     url:'/d1/index.html'},
+  {t:'Interlude',         url:'/app/interlude.html'},
+  {t:'Demo',s:'Investor update',  url:'/d2/index.html'},
+  {t:'Slide',s:'Win-win-win',     url:'/app/slides/02-win-win-win.html'},
+  {t:'Slide',s:'Market',     url:'/app/slides/03-market.html'},
+  {t:'Slide',s:'Vision',     url:'/app/slides/04-vision.html'}
+];
+const N=STEPS.length;
+let cur=-1,frame=null,hideT=0,hovering=false;
+
+$('#steps').innerHTML=STEPS.map((s,i)=>`<button class="st" data-i="${i}" title="Step ${i+1} · ${s.t}${s.s?' · '+s.s:''}"><span class="n">${i+1}</span>${s.t}${s.s?` <small>· ${s.s}</small>`:''}</button>`).join('');
+$('#prev').innerHTML=svg('l');$('#next').innerHTML=svg('r');$('#fs').innerHTML=svg('fs');$('#ownX').innerHTML=svg('x');
+$('#ownC').innerHTML=svg('sp')+'Coming soon';$('#ownGo').innerHTML='Run it'+svg('go');
+
+function paint(){
+  document.querySelectorAll('.st').forEach((b,i)=>{
+    b.classList.toggle('cur',i===cur);b.classList.toggle('done',i<cur);
+    b.querySelector('.n').innerHTML=i<cur?svg('ok'):String(i+1);
+    b.setAttribute('aria-current',i===cur?'step':'false');
+  });
+  $('#prev').disabled=cur<=0;$('#next').disabled=cur>=N-1;
+  $('#prog').style.width=((cur+1)/N*100)+'%';
+}
+
+/* only the current step lives in the DOM: the old frame is paused, faded out, then removed */
+function go(i,opts){
+  i=Math.max(0,Math.min(N-1,i|0));
+  if(i===cur){ if(opts&&opts.reset) post(frame,{watari:'reset'}); peek(); return; }
+  cur=i;paint();
+  if(location.hash!=='#'+(i+1)) history.replaceState(null,'','#'+(i+1));
+  const old=frame;
+  if(old){post(old,{watari:'pause'});old.classList.remove('on');setTimeout(()=>old.remove(),420);}
+  const f=document.createElement('iframe');
+  f.src=STEPS[i].url;f.title='Step '+(i+1);
+  f.setAttribute('allow','autoplay; microphone; camera; clipboard-read; clipboard-write; fullscreen');
+  f.addEventListener('load',()=>{ if(f!==frame) return; f.classList.add('on'); hook(f); focusFrame(); },{once:true});
+  $('#frames').appendChild(f);frame=f;
+  setTimeout(()=>{ if(f===frame) f.classList.add('on'); },900); // never stay blank if load is slow
+  peek();
+}
+function post(f,m){try{f&&f.contentWindow&&f.contentWindow.postMessage(m,location.origin);}catch(e){}}
+function focusFrame(){try{frame&&frame.focus();frame&&frame.contentWindow.focus();}catch(e){}}
+
+/* same-origin frames: watch their pointer so the tracker can appear near the bottom edge */
+function hook(f){
+  try{
+    const w=f.contentWindow;
+    w.addEventListener('mousemove',e=>nearBottom(e.clientY,w.innerHeight),{passive:true});
+  }catch(e){}
+}
+function nearBottom(y,h){ if(h-y<90) peek(); }
+function peek(ms){
+  $('#dock').classList.add('show');clearTimeout(hideT);
+  hideT=setTimeout(()=>{ if(!hovering) $('#dock').classList.remove('show'); },ms||2000);
+}
+addEventListener('mousemove',e=>nearBottom(e.clientY,innerHeight),{passive:true});
+$('#dock').addEventListener('mouseenter',()=>{hovering=true;peek();});
+$('#dock').addEventListener('mouseleave',()=>{hovering=false;peek(1200);});
+
+/* controls */
+$('#steps').addEventListener('click',e=>{const b=e.target.closest('.st');if(b){go(+b.dataset.i,{reset:true});focusFrame();}});
+$('#prev').onclick=()=>{go(cur-1);focusFrame();};
+$('#next').onclick=()=>{go(cur+1);focusFrame();};
+$('#fs').onclick=()=>{const d=document;if(d.fullscreenElement)d.exitFullscreen();else d.documentElement.requestFullscreen&&d.documentElement.requestFullscreen().catch(()=>{});focusFrame();};
+
+/* keys: only navigation. Number keys, arrows and space belong to the demos. */
+addEventListener('keydown',e=>{
+  if($('#veil').classList.contains('on')){ if(e.key==='Escape'){e.preventDefault();closeOwn();} return; }
+  if(e.target&&(e.target.isContentEditable||/INPUT|TEXTAREA/.test(e.target.tagName))) return;
+  if(e.key==='PageDown'||e.key===']'){e.preventDefault();go(cur+1);}
+  else if(e.key==='PageUp'||e.key==='['){e.preventDefault();go(cur-1);}
+});
+/* steps forward clicker keys through /app/bridge.js */
+addEventListener('message',e=>{
+  if(e.origin!==location.origin||!e.data||typeof e.data!=='object') return;
+  if(e.data.watari==='nav'&&frame&&e.source===frame.contentWindow) go(cur+(e.data.dir>0?1:-1));
+});
+addEventListener('hashchange',()=>{const n=parseInt(location.hash.slice(1),10);if(n>=1&&n<=N&&n-1!==cur) go(n-1);});
+
+/* hidden placeholder */
+function openOwn(){$('#veil').classList.add('on');setTimeout(()=>$('#ownX').focus(),30);}
+function closeOwn(){$('#veil').classList.remove('on');focusFrame();}
+$('#own').onclick=openOwn;$('#ownX').onclick=closeOwn;
+$('#veil').addEventListener('click',e=>{if(e.target.id==='veil')closeOwn();});
+
+const start=parseInt(location.hash.slice(1),10);
+go(start>=1&&start<=N?start-1:0);
+})();
+</script>
+</body>
+</html>

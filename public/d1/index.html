@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en" data-role="stage">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<base href="/d1/">
+<link rel="icon" href="data:,">
+<title>WATARI · CFO on Call</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="core/phone.css">
+<link rel="stylesheet" href="core/stage.css">
+</head>
+<body>
+<div id="app" class="lay-calm">
+  <!-- header: same language as Demo 2 -->
+  <div class="hdr">
+    <div class="logo"><span class="mk"></span><div><b>WATARI</b><small>CFO agent</small></div></div>
+    <div class="co"><span class="av">K</span>Kodo <span>· Seed · B2B SaaS</span></div>
+    <span class="sp"></span>
+    <div class="rail" id="rail"></div>
+    <span class="sp"></span>
+    <span class="ldot" id="ldot" data-tip="Rehearsal · sound on laptop"></span>
+    <div class="clock" id="clock"></div>
+    <div class="ctrl"><button id="bPlay" data-tip="Play / pause (Space to start, P to pause)"></button><button id="bNext" data-tip="Next beat: answer, next line or approve"></button><button id="bRe" data-tip="Restart (R)"></button></div>
+  </div>
+
+  <!-- left: cash -->
+  <section class="panel cash" id="cash">
+    <div class="ph-k"><svg class="i" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>Cash this week</div>
+    <h3 id="coName">Kodo</h3>
+    <p class="cash-sub" id="cashSub"></p>
+    <div id="sigs"></div>
+    <div id="gauge">
+      <div id="tank" data-tip="Due Friday vs in the account. The hatched part is money that is not there.">
+        <div class="f" id="fBal"></div><div class="f" id="fCred"></div><div class="f" id="fGap"></div>
+      </div>
+      <div id="tl">
+        <div class="tl" id="tlPay"><div class="k"></div><div class="v num"></div><div class="s" id="tlPaySub"></div></div>
+        <div class="tl" id="tlGap"><div class="k"></div><div class="v"></div></div>
+        <div class="tl" id="tlBal"><div class="k">In the account · KBC</div><div class="v num"></div></div>
+      </div>
+    </div>
+    <div id="covered"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg><span>Friday covered</span></div>
+    <div class="calmnote" id="calmNote"><i></i>Watching cash, payroll and invoices</div>
+  </section>
+
+  <!-- centre: the agent stage -->
+  <section class="stage" id="stage">
+    <div id="world">
+      <div class="ring"></div><div class="ring r2"></div>
+      <div id="orbStage"><canvas id="orb"></canvas><canvas id="wave"></canvas></div>
+      <div id="pring"></div>
+    </div>
+    <div class="phase-t" id="phaseT"></div>
+    <div class="live" id="live"><i></i>Live call<b class="num" id="callT">00:00</b></div>
+    <div class="mood"><span class="chip" id="mood"></span></div>
+    <div class="now" id="now"><div class="lgo"></div><div class="t"></div><div class="w"></div><div class="pg"><i></i></div></div>
+    <div class="cause" id="cause"></div>
+    <div class="trx" id="tx">
+      <div class="trx-h"><span class="lbl">Call transcript</span><span class="sub">Speech to text from Larry's iPhone</span><span class="sp"></span><span id="mic"><svg class="i" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></svg>Larry speaking<span class="bars"><i></i><i></i><i></i><i></i><i></i></span></span></div>
+      <div id="lines"></div>
+      <div class="trx-f"><span id="faceWait"><svg class="i" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/></svg>Waiting for Larry's Face ID in KBC Mobile</span><span class="sp"></span><span id="cue"></span></div>
+    </div>
+    <div class="acts" id="acts"><div class="acts-h" id="actsH"></div><div class="acts-g" id="actsG"></div></div>
+    <div class="ledger" id="ledger"></div>
+    <div class="ticker" id="ticker" data-tip="Execution log · L or click to expand"><div class="h"><i></i>Execution log</div></div>
+  </section>
+
+  <!-- right: the iPhone mirror -->
+  <section class="phcol" id="phcol">
+    <div id="glow"></div>
+    <div id="ph"></div>
+    <div class="phcap" id="phcap"><svg class="i" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg>Larry's iPhone · mirrored live</div>
+  </section>
+
+  <div id="pops"></div>
+  <div class="runp" id="runp"><div class="rh">Execution log <small id="runN">0 steps</small><button data-close-log aria-label="Close">×</button></div><div class="rbody" id="logFull"></div></div>
+</div>
+
+<!-- operator tools: hidden almost -->
+<div id="tools">
+  <div class="tl-p" id="toolsP"></div>
+  <button class="tl-b" id="toolsB" aria-label="Operator tools" data-tip="Operator tools · ? for keys"><svg class="i" viewBox="0 0 24 24"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg></button>
+</div>
+
+<div class="ov" id="helpOv"><div class="sheet"><button class="x" data-close aria-label="Close">×</button><h3>Keys</h3><div class="keys" id="keyList"></div></div></div>
+<div class="ov" id="mailOv"><div class="sheet" id="mailSheet"></div></div>
+<div class="ov" id="bkOv"><video id="backup" data-src="backup.mp4" preload="none" playsinline controls></video><div class="bkl" id="bkL">Backup video · backup.mp4 · Esc to close</div></div>
+<div id="typeBox"><input id="typeIn" placeholder="Type Larry's line, Enter to send" autocomplete="off"><small>Enter send · Esc close</small></div>
+<div id="tip"></div>
+
+<script src="core/orb.js"></script>
+<script src="core/call.js"></script>
+<script src="core/phone.js"></script>
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const C=W.CFG, eur=W.eur, B=W.bus;
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const ICO={
+  play:'<polygon points="6 3 20 12 6 21 6 3"/>',pause:'<rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/>',
+  next:'<polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/>',re:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',sparkles:'<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+  scan:'<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/>',
+  alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
+  eye:'<path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/>',
+  loader:'<path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/>',
+  done:'<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  bank:'<line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',rocket:'<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>',
+  hand:'<path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/>',
+  mail:'<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+  mic:'<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>',
+  smart:'<rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/>',
+};
+const ic=(n,c='')=>`<svg class="i ${c}" viewBox="0 0 24 24">${ICO[n]||''}</svg>`;
+
+/* ================= canvas scale (same as Demo 2) ================= */
+const APP=$('#app'), STAGE=$('#stage'), WORLD=$('#world');
+let SCALE=1;
+function fit(){ SCALE=Math.min(innerWidth/1600,innerHeight/940); APP.style.transform=`translate(-50%,-50%) scale(${SCALE})`; }
+addEventListener('resize',fit); fit();
+function rel(el){ const r=el.getBoundingClientRect(), a=APP.getBoundingClientRect(); return {x:(r.left-a.left)/SCALE,y:(r.top-a.top)/SCALE,w:r.width/SCALE,h:r.height/SCALE}; }
+
+/* ================= header ================= */
+const STEPS=['Calm','Signals','Cause','Call','Work','Done'];
+const SC2STEP={calm:0,signals:1,alert:2,dialing:3,ringing:3,call:3,work:4,end:5};
+$('#rail').innerHTML=STEPS.map((s,i)=>`<button data-i="${i}" tabindex="-1"><span class="n">${i+1}</span>${s}</button>`).join('');
+let stepIdx=0;
+function setStep(i){ stepIdx=i; $$('#rail button').forEach((b,j)=>{ b.className=j<i?'done':j===i?'cur':''; b.querySelector('.n').innerHTML=j<i?ic('check'):j+1; }); }
+const CAP={
+  calm:[0,'Quiet watch',`WATARI watches ${C.company}'s bank, payroll and invoices in the background. Larry builds.`],
+  signals:[1,'Cash vs payroll','Reads the KBC balance and Friday\'s SD Worx payroll run, three days ahead.'],
+  cause:[2,'Find the cause','Searches Attio and Peppol for the money that should be there.'],
+  alert:[2,'Payroll at risk','A mail is too slow and a push too weak. Three days left, so WATARI calls.'],
+  dialing:[3,'Calling Larry','WATARI rings Larry\'s iPhone, as his CFO, via KBC.'],
+  ringing:[3,'Calling Larry','WATARI rings Larry\'s iPhone, as his CFO, via KBC.'],
+  call:[3,'On the call','Larry speaks to his phone. WATARI listens, thinks and proposes a fix.'],
+  work:[4,'Back to work','The call is over. WATARI executes across Outlook, KBC, SD Worx, Attio and Calendar.'],
+  end:[5,'Payroll covered','Friday is safe, the client is chased, Larry is back to building.'],
+};
+function caption(key){ const c=CAP[key]; if(!c) return; $('#phaseT').innerHTML=`<div class="k">Phase ${c[0]+1} of 6 · ${STEPS[c[0]]}</div><h2>${c[1]}</h2><p>${c[2]}</p>`; }
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function tickClock(){ const d=new Date(); $('#clock').innerHTML=`<b>${DAYS[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]} ${d.getFullYear()}</b><br>${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')} CET`; }
+tickClock(); setInterval(tickClock,1000);
+
+/* ================= cash panel ================= */
+$('#cashSub').textContent=C.companyTag;
+$('#coName').textContent=C.company;
+const GHOST=[['bal','kbc','KBC business account'],['pay','sdworx','SD Worx payroll'],['inv','attio','Open invoices']];
+function renderGhosts(){ $('#sigs').innerHTML=GHOST.map(([id,src,t])=>`<div class="sig ghost" data-id="${id}">${W.logo(src,34)}<div class="tx"><div class="t">${t}</div><div class="s">watching</div></div><div class="a">·</div></div>`).join(''); }
+function renderSig(s){ const el=$(`.sig[data-id="${s.id}"]`); if(!el) return; el.className='sig in '+s.tone;
+  const amt=s.tone==='neg'?'−'+eur(Math.abs(s.amt)):eur(s.amt);
+  const sub=s.tone==='late'?`<span class="late-b">${ic('clock')}${esc(s.sub)}</span>`:esc(s.sub);
+  el.innerHTML=`${W.logo(s.src,34)}<div class="tx"><div class="t">${esc(s.title)}</div><div class="s">${sub}</div></div><div class="a num">${amt}</div>`;
+  el.dataset.tip= s.id==='bal'?'Read from the KBC account API, live':(s.id==='pay'?'Next payroll run, read from SD Worx':'Found in Attio, delivery confirmed on Peppol'); }
+const pct=v=>v/C.payroll*100;
+function gaugeBal(){ $('#gauge').classList.remove('ghost'); $('#fBal').style.height=pct(C.balance)+'%'; const b=$('#tlBal'); b.style.opacity=1; b.querySelector('.v').textContent=eur(C.balance); }
+function gaugePay(){ $('#tlPay .k').innerHTML=`${ic('users')}Due · SD Worx payroll`; $('#tlPay .v').textContent=eur(C.payroll); $('#tlPaySub').textContent=`${C.payday} · ${C.people} people`; }
+function gaugeGap(g){ $('#fGap').classList.add('on'); $('#fGap').style.height=pct(g.gap)+'%'; const t=$('#tlGap'); t.style.opacity=1; t.style.top=`max(64px, calc(${(pct(g.gap)/2).toFixed(1)}% - 22px))`;
+  t.querySelector('.k').innerHTML=`${ic('alert')}Missing on Friday`; t.querySelector('.v').innerHTML=`<span class="num">${eur(g.gap)}</span> short`; }
+function gaugeCover(){ $('#fCred').style.bottom=pct(C.balance)+'%'; $('#fCred').style.height=pct(C.gap)+'%'; $('#fGap').style.opacity=0;
+  const t=$('#tlGap'); t.classList.add('cov'); t.querySelector('.k').innerHTML=`${ic('bank')}KBC credit line`; t.querySelector('.v').innerHTML=`<span class="num">+${eur(C.credit.draw)}</span>`;
+  $('#covered').classList.add('on'); }
+let covered=false;
+function coverWithCoins(){ if(covered) return; covered=true; light('kbc','on',2200); const src=$('.sig[data-id="bal"] .wlogo')||PL('kbc');
+  if(!RM) K.fly(src,$('#fGap'),{kind:'coin',n:12,spread:30,dur:1100}); setTimeout(gaugeCover,RM?0:900); }
+
+/* ================= world: orb + ring of partners ================= */
+const SW=842, SH=852, OX=421, OY=338, RR=246;
+const orb=K.Orb($('#orb'),{scale:.27,n:600});
+const RING=['kbc','sdworx','attio','peppol','colruyt','outlook','calendar'];
+const POS={};
+$('#pring').innerHTML=RING.map((id,i)=>{ const p=W.PARTNERS[id]; const a=(-90+i*360/RING.length)*Math.PI/180; const x=OX+Math.cos(a)*RR, y=OY+Math.sin(a)*RR; POS[id]=[x,y];
+  return `<div class="pt" data-id="${id}" style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px" data-tip="<b>${esc(p.name)}</b> · ${esc(p.role)}<br><span style='opacity:.7'>connected via ${p.proto}</span>"><span class="lg">${W.logo(id,46)}<span class="ok">${ic('check')}</span></span><span class="nm">${esc(p.name.replace(' Group',''))}</span><span class="q"></span></div>`; }).join('');
+const PT=id=>$(`#pring .pt[data-id="${id}"]`);
+const PL=id=>{ const p=PT(id); return p&&p.querySelector('.lg'); };
+const angleOf=id=>{ const [x,y]=POS[id]||[OX,OY-1]; return Math.atan2(y-OY,x-OX)*180/Math.PI; };
+function light(id,cls='on',ms=1600){ const p=PT(id); if(!p) return; p.classList.add(cls,'seen'); if(ms) setTimeout(()=>p.classList.remove(cls),ms); }
+/* flow lines: same look as K.link, but they follow both ends while the camera or the layout moves */
+const FNS='http://www.w3.org/2000/svg';
+const FL=(()=>{ const o=document.createElementNS(FNS,'svg'); o.id='flows'; o.innerHTML='<defs><filter id="fglow"><feGaussianBlur stdDeviation="3"/></filter></defs>'; document.body.appendChild(o); return o; })();
+const ctr=el=>{ const r=el.getBoundingClientRect(); return [r.left+r.width/2,r.top+r.height/2]; };
+function linkTo(from,to,{color='#00aeef',dur=800,width=2.2,bend=.18,keep=700}={}){ if(RM||!from||!to) return Promise.resolve();
+  return new Promise(res=>{ const g=document.createElementNS(FNS,'g'), gl=document.createElementNS(FNS,'path'), p=document.createElementNS(FNS,'path'), dot=document.createElementNS(FNS,'circle');
+    [gl,p].forEach(e=>{ e.setAttribute('fill','none'); e.setAttribute('stroke',color); e.setAttribute('stroke-linecap','round'); });
+    const k=Math.max(.6,SCALE); gl.setAttribute('stroke-width',width*3.5*k); gl.setAttribute('opacity',.18); gl.setAttribute('filter','url(#fglow)'); p.setAttribute('stroke-width',width*k); dot.setAttribute('r',4.5*k); dot.setAttribute('fill',color);
+    g.append(gl,p,dot); FL.appendChild(g); const t0=performance.now(); let done=false;
+    (function step(now){ if(!g.isConnected) return; const [x1,y1]=ctr(from),[x2,y2]=ctr(to); const dx=x2-x1,dy=y2-y1; const d=`M${x1},${y1} Q${(x1+x2)/2-dy*bend},${(y1+y2)/2+dx*bend} ${x2},${y2}`;
+      gl.setAttribute('d',d); p.setAttribute('d',d); const L=p.getTotalLength(); const q=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-q,3);
+      [gl,p].forEach(x=>{ x.style.strokeDasharray=L; x.style.strokeDashoffset=L*(1-e); }); const pt=p.getPointAtLength(L*e); dot.setAttribute('cx',pt.x); dot.setAttribute('cy',pt.y);
+      if(q>=1&&!done){ done=true; res(); g.animate([{opacity:1},{opacity:0}],{duration:500,delay:keep,fill:'forwards'}).onfinish=()=>g.remove(); }
+      requestAnimationFrame(step); })(t0); }); }
+
+/* camera (Demo 2 "v4 camera"): the world zooms toward what WATARI is working with */
+let camMode='wide', camPt=null, camTm=null;
+function camApply(){ let s=1,tx=0,ty=0;
+  if(camMode==='compact'){ s=.56; tx=OX-OX*s; ty=168-OY*s; }
+  else if(camMode==='work'){ s=.66; tx=OX-OX*s; ty=188-OY*s; }
+  else if(camPt){ s=1.2; const mx=camPt[0]*.55+OX*.45, my=camPt[1]*.55+OY*.45; tx=SW/2-mx*s; ty=SH/2-40-my*s; tx=Math.min(0,Math.max(SW-SW*s,tx)); ty=Math.min(0,Math.max(SH-SH*s,ty)); }
+  WORLD.style.transform=`translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) scale(${s})`;
+  const md=$('.mood'); md.style.left=(tx+OX*s).toFixed(1)+'px'; md.style.top=(ty+(OY+124)*s+(s<1?6:0)).toFixed(1)+'px';
+  STAGE.classList.toggle('focusing',camMode==='wide'&&!!camPt);
+  $$('#pring .pt').forEach(p=>p.classList.toggle('fo',!!camPt&&camMode==='wide'&&camPt.id===p.dataset.id)); }
+function camFocus(id,ms){ clearTimeout(camTm); camPt=id&&POS[id]?Object.assign([...POS[id]],{id}):null; camApply(); if(ms) camTm=setTimeout(()=>{ camPt=null; camApply(); },ms); }
+function camSet(mode){ camMode=mode; STAGE.dataset.mode=mode; if(mode!=='wide'){ clearTimeout(camTm); camPt=null; } camApply(); }
+
+/* waveform ring (Watari voice) + mic bars (Larry) */
+const wv=$('#wave'), wx=wv.getContext('2d'); let lvW=0,tgW=0,lvU=0,tgU=0,wt=0;
+function wavDraw(){ const d=2; if(wv.width!==640*d){ wv.width=640*d; wv.height=640*d; }
+  const w=wv.width,h=wv.height,Cc=Math.min(w,h); wx.clearRect(0,0,w,h); wt+=.016;
+  tgW*=.9; tgU*=.88; lvW+=(tgW-lvW)*.35; lvU+=(tgU-lvU)*.35;
+  const R0=Cc*.405, N=96; wx.lineCap='round';
+  wx.strokeStyle='rgba(11,59,122,.10)'; wx.lineWidth=d*1.2; wx.beginPath(); wx.arc(w/2,h/2,R0,0,7); wx.stroke();
+  if(lvW>.01){ for(let i=0;i<N;i++){ const a=i/N*Math.PI*2-Math.PI/2; const nz=.5+.5*Math.sin(i*.9+wt*9)*Math.sin(i*.37-wt*4.3); const L=Cc*(.006+lvW*.075*(.25+.75*nz));
+      wx.strokeStyle=i%2?`rgba(91,75,214,${.3+lvW*.6})`:`rgba(0,174,239,${.35+lvW*.6})`; wx.lineWidth=d*3; wx.beginPath(); wx.moveTo(w/2+Math.cos(a)*R0,h/2+Math.sin(a)*R0); wx.lineTo(w/2+Math.cos(a)*(R0+L),h/2+Math.sin(a)*(R0+L)); wx.stroke(); } }
+  $$('.ln.w.speaking .bars i').forEach((b,i)=>b.style.height=(18+82*lvW*(.45+.55*Math.abs(Math.sin(wt*7+i*1.3))))+'%');
+  $$('#mic .bars i').forEach((b,i)=>b.style.height=(18+82*lvU*(.45+.55*Math.abs(Math.sin(wt*8+i*1.7))))+'%');
+  requestAnimationFrame(wavDraw); }
+requestAnimationFrame(wavDraw);
+
+/* ================= stage chrome (mood chip, now card, log) ================= */
+const MOODIC={alert:'alert',done:'done',thinking:'sparkles',listening:'mic',speaking:'phone',focus:'scan'};
+function setMood(m,label){ orb.setMood(m); const el=$('#mood'); el.className='chip '+({alert:'wr',done:'ok',thinking:'vi',listening:'vi'}[m]||'');
+  el.innerHTML=ic(MOODIC[m]||'sparkles')+'WATARI · '+esc(label||(K.moods[m]||{}).label||m); }
+function now(i,t,w,p,app,cls=''){ const n=$('#now'); n.className='now on '+cls+(app?' has':''); n.querySelector('.lgo').innerHTML=app?W.logo(app,34):'';
+  n.querySelector('.t').innerHTML=(app?'':ic(i))+t; n.querySelector('.w').innerHTML=w; n.querySelector('.pg i').style.width=(p||0)+'%'; n.classList.remove('flash'); void n.offsetWidth; n.classList.add('flash'); }
+function nowOff(){ $('#now').classList.remove('on'); }
+const TAG={phase:['lk','phase'],read:['in','read'],call:['in','call'],rule:['wr','rule'],think:['ai','agent'],pass:['ok','ok'],block:['wr','block'],decide:['wr','decide']};
+const logs=[];
+function addLog(d){ logs.push(d); const [cl,lb]=TAG[d.kind]||['lk',d.kind]; const tk=$('#ticker');
+  tk.insertAdjacentHTML('beforeend',`<div class="ln"><span class="tg ${cl}">${lb}</span><span><b>${esc(d.text)}</b>${d.detail?' · '+esc(d.detail):''}</span></div>`);
+  const ls=$$('.ln',tk); if(ls.length>4) ls[0].remove();
+  const t=new Date(d.t||Date.now()); const ts=[t.getHours(),t.getMinutes(),t.getSeconds()].map(v=>String(v).padStart(2,'0')).join(':');
+  $('#logFull').insertAdjacentHTML('beforeend',`<div class="lrow"><span class="ts">${ts}</span><span class="tg ${cl}">${lb}</span><span>${esc(d.text)}${d.detail?` <em>· ${esc(d.detail)}</em>`:''}</span></div>`);
+  $('#logFull').scrollTop=1e6; $('#runN').textContent=logs.length+' steps'; }
+function toggleLog(){ $('#runp').classList.toggle('on'); }
+$('#ticker').addEventListener('click',toggleLog);
+$('#runp [data-close-log]').addEventListener('click',toggleLog);
+
+/* ================= cause card ================= */
+function showCause(c){ const el=$('#cause'); el.innerHTML=`<div class="lgo">${W.logo(c.id||'colruyt',52)}</div><div class="ct"><div class="k">${ic('search')}Cause found · Attio + Peppol</div><div class="n">${esc(c.name)}</div><div class="d">Invoice <span class="num">${esc(c.invoice)}</span> · sent ${esc(c.sent)}</div></div><div class="big"><div class="v num">${eur(c.amount)}</div><div class="l"><span class="num">${c.daysLate}</span> days late</div></div>`;
+  el.dataset.tip='Every other client pays on time. This one invoice explains the full gap.'; el.classList.add('on'); }
+
+/* ================= transcript ================= */
+const lines=$('#lines');
+function trimLines(){ while(lines.children.length>4) lines.firstElementChild.remove();
+  const fits=()=>{ let t=0; [...lines.children].forEach(c=>t+=c.offsetHeight+10); return t<=lines.clientHeight+2; };
+  while(lines.children.length>1 && !fits()) lines.firstElementChild.remove();
+  [...lines.children].forEach((l,i,a)=>l.classList.toggle('old',i<a.length-2)); }
+function sayLine(d){ let el=lines.querySelector(`[data-sid="${d.sid}"]`);
+  if(!el){ el=document.createElement('div'); el.dataset.sid=d.sid; el.className='ln '+(d.who==='watari'?'w':'u');
+    el.innerHTML= d.who==='watari' ? `<div class="who"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span>WATARI<span class="ai">AI</span></div><div class="tt"></div>` : `<div class="who">${ic('mic')}${esc(C.founder)}<span class="lv">live</span></div><div class="tt"></div>`;
+    lines.append(el); }
+  el.querySelector('.tt').textContent=d.text; el.classList.toggle('partial',!!d.partial); trimLines();
+  if(d.who==='user'){ $('#mic').classList.toggle('on',!!d.partial); if(d.final) $('#mic').classList.remove('on'); $('#cue').classList.remove('on'); } }
+let thinkEl=null;
+const KW=[[/face id|approval|kbc|credit/i,'kbc'],[/payroll|sd worx/i,'sdworx'],[/colruyt|client/i,'colruyt'],[/chase|mail/i,'outlook'],[/attio/i,'attio'],[/peppol|invoice/i,'peppol'],[/calendar/i,'calendar']];
+function thinkStep(text){ if(!thinkEl){ thinkEl=document.createElement('div'); thinkEl.className='ln th'; thinkEl.innerHTML=`<div class="who">${ic('sparkles')}Thinking</div><div class="tt"></div>`; lines.append(thinkEl); trimLines(); }
+  const hit=KW.find(([re])=>re.test(text)); const chip=document.createElement('span'); chip.className='tc'; chip.innerHTML=(hit?W.logo(hit[1],18):ic('sparkles'))+esc(text);
+  thinkEl.querySelector('.tt').append(chip); trimLines();
+  if(hit){ const p=PT(hit[1]); p.classList.add('think','seen'); setTimeout(()=>p.classList.remove('think'),1800); requestAnimationFrame(()=>linkTo(chip,p.querySelector('.lg'),{color:'#5b4bd6',dur:450,width:1.6,bend:.12,keep:150})); } }
+
+/* ================= plan + work cards ================= */
+const ACT_ORDER=['mail','credit','payroll','crm','cal','repay'];
+const ST={preview:['eye','AI plan · preview'],running:['loader','Running'],done:['done','Done']};
+let foTm=null;
+function renderAct(a){ const box=$('#acts'); box.classList.add('on'); const g=$('#actsG'); let el=g.querySelector(`.wk[data-id="${a.id}"]`); let fresh=false;
+  if(!el){ fresh=true; el=document.createElement('div'); el.className='wk'; el.dataset.id=a.id; const after=ACT_ORDER.slice(ACT_ORDER.indexOf(a.id)+1).map(i=>g.querySelector(`.wk[data-id="${i}"]`)).find(Boolean); g.insertBefore(el,after||null); }
+  el.classList.remove('preview','running','done'); el.classList.add(a.status||'preview');
+  const [i,lb]=ST[a.status]||ST.preview; const det=esc(a.detail||'').replace(/(€[\d.]+|\d+ people|INV-[\d-]+|\d+ days|Thu \d\d:\d\d|\d,\d% APR)/g,'<span class="num">$1</span>');
+  el.innerHTML=`<div class="h">${W.logo(a.app||'kbc',30)}<div class="t">${esc(a.title||'')}</div></div><div class="d">${det}</div><div class="st">${ic(i)}${lb}<span class="more">details</span></div>`;
+  el.dataset.tip=a.status==='preview'?'Proposed by WATARI while it speaks. Nothing happens before Larry approves.':'Click for details';
+  if(fresh && !RM){ el.classList.add('pop'); setTimeout(()=>el.classList.remove('pop'),900); }
+  if(a.status==='done' && a.app){ const p=PT(a.app); if(p) p.classList.add('done','seen'); }
+  if(a.status==='running'){ if(a.app) light(a.app,'on',1400); focusCard(el); }
+  if(a.id==='credit' && a.status==='done' && W.state.scene==='work') coverWithCoins(); }
+function focusCard(el){ clearTimeout(foTm); $$('#actsG .wk').forEach(w=>w.classList.toggle('fo',w===el)); STAGE.classList.add('cardfocus');
+  foTm=setTimeout(()=>{ $$('#actsG .wk').forEach(w=>w.classList.remove('fo')); STAGE.classList.remove('cardfocus'); },1300); }
+function actsHead(t,s){ $('#actsH').innerHTML=`<b>${t}</b><span>${s}</span>`; }
+function actDetails(id){ const a=W.state.actions[id]; if(!a) return; let body='';
+  if(id==='mail'){ body=`<div class="mailh"><b>From</b><span>${C.founder.toLowerCase()}@kodo.be · sent from Larry's own Outlook</span><b>To</b><span class="num">${esc(C.client.ap)}</span><b>Subject</b><span>Invoice <span class="num">${C.client.invoice}</span> · <span class="num">${eur(C.client.amount)}</span> · <span class="num">${C.client.daysLate}</span> days overdue</span><b>Attached</b><span>${C.client.invoice}.pdf · Peppol delivery receipt</span></div>
+    <div class="aitag">${ic('sparkles')}AI draft · tone polite, firm</div>
+    <div class="mailb">Dear ${esc(C.client.name)} accounts payable team,
+
+Our invoice ${C.client.invoice} of ${eur(C.client.amount)}, sent on ${C.client.sent} and delivered via Peppol, is now ${C.client.daysLate} days past due.
+
+Could you confirm the payment date this week? I have attached the invoice and the Peppol receipt again for convenience.
+
+Thank you,
+${esc(C.founder)} · ${esc(C.company)}</div>`; }
+  else if(id==='credit'||id==='repay'){ body=`<div class="kv"><b>Credit line limit</b><span class="num">${eur(C.credit.limit)}</span><b>Draw</b><span class="num">${eur(C.credit.draw)}</span><b>Estimated cost</b><span class="num">~${eur(C.credit.fee)}</span><b>Rate</b><span class="num">${C.credit.rate}</span><b>Expected duration</b><span class="num">${C.credit.days} days</span><b>Repayment</b><span>automatic when ${esc(C.client.short)} pays</span><b>Approval</b><span>Face ID in KBC Mobile, founder only above <span class="num">€10.000</span></span></div>`; }
+  else if(id==='payroll'){ body=`<div class="kv"><b>Provider</b><span>SD Worx</span><b>Run</b><span class="num">${C.payday}</span><b>People</b><span class="num">${C.people}</span><b>Amount</b><span class="num">${eur(C.payroll)}</span><b>Funded from</b><span>KBC account <span class="num">${eur(C.balance)}</span> + credit <span class="num">${eur(C.credit.draw)}</span></span></div>`; }
+  else body=`<div class="kv"><b>App</b><span>${esc((W.PARTNERS[a.app]||{}).name||a.app)}</span><b>What</b><span>${esc(a.title)}</span><b>Detail</b><span>${esc(a.detail||'')}</span><b>Status</b><span>${esc(a.status)}</span></div>`;
+  $('#mailSheet').innerHTML=`<button class="x" data-close aria-label="Close">×</button><h3>${esc(a.title)}</h3>${body}`; $('#mailOv').classList.add('on'); }
+$('#actsG').addEventListener('click',e=>{ const c=e.target.closest('.wk'); if(c) actDetails(c.dataset.id); });
+
+function renderLedger(){ const L=W.state.ledger, el=$('#ledger'); const cov=L.payroll==='covered';
+  el.innerHTML=`<div class="lgx" data-tip="Founder value: time and stress, computed from the steps WATARI ran"><span class="ico">${ic('rocket')}</span><div><div class="k">Founder</div><div class="v">Time saved <span class="num">${esc(L.timeSaved||'2h 10m')}</span> · payroll ${cov?'<b class="okc">covered</b>':'at risk'}</div></div></div>
+  <div class="lgx" data-tip="Bank value: a drawn credit line, fee income and a stickier relationship"><span class="ico">${W.logo('kbc',30)}</span><div><div class="k">KBC</div><div class="v">Credit drawn <span class="num">${eur(L.kbcCredit||0)}</span> · fee <span class="num">${eur(L.fee||0)}</span></div></div></div>
+  <div class="lgx" data-tip="Ecosystem value: partners run on time"><span class="ico g">${ic('hand')}</span><div><div class="k">Partners</div><div class="v">SD Worx runs on time · ${esc(C.client.short)} reminded</div></div></div>`;
+  el.classList.add('on'); }
+
+/* ================= phone mirror + layout ================= */
+const ph=$('#ph'); W.Phone.mount(ph,{mode:'mirror'});
+function setLayout(l){ APP.classList.toggle('lay-big',l==='big'); APP.classList.toggle('lay-calm',l!=='big'); }
+
+/* pop-outs: a live, scaled crop of the phone screen leaves the mirror, holds, and eases back */
+let pop=null;
+function popPhone(sel,{k=1.55,hold=2600,pad=10,crop=null,label='On Larry\'s iPhone',minHold=0}={}){
+  if(RM) return null; closePop(true);
+  const scr=ph.querySelector('.ip-screen'); const els=[].concat(sel).map(s=>ph.querySelector(s)).filter(e=>e&&!e.hidden&&e.offsetParent!==null);
+  if(!els.length) return null;
+  const sr=scr.getBoundingClientRect(), q0=sr.width/393;
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9; els.forEach(e=>{ const r=e.getBoundingClientRect(); x0=Math.min(x0,r.left);y0=Math.min(y0,r.top);x1=Math.max(x1,r.right);y1=Math.max(y1,r.bottom); });
+  let c={x:(x0-sr.left)/q0-pad,y:(y0-sr.top)/q0-pad,w:(x1-x0)/q0+2*pad,h:(y1-y0)/q0+2*pad}; if(crop) c=Object.assign(c,crop(c));
+  c.x=Math.max(0,c.x); c.y=Math.max(0,c.y); c.w=Math.min(393-c.x,c.w); c.h=Math.min(852-c.y,c.h);
+  const Wd=c.w*k, Ht=c.h*k, S=rel(scr), q=S.w/393, src={x:S.x+c.x*q,y:S.y+c.y*q,w:c.w*q,h:c.h*q};
+  const P=rel(ph); let tx=P.x-Wd+P.w*.2, ty=src.y+src.h/2-Ht/2; tx=Math.max(330,tx); ty=Math.min(924-Ht-8,Math.max(110,ty));
+  const w=document.createElement('div'); w.className='popw'; w.style.cssText=`left:${tx}px;top:${ty}px;width:${Wd}px;height:${Ht}px`;
+  w.innerHTML=`<div class="popl">${ic('smart')}${label}</div><div class="popb"><div class="popi" style="transform:scale(${k}) translate(${-c.x}px,${-c.y}px)"></div></div>`;
+  const inner=w.querySelector('.popi');
+  let sig=''; const sync=()=>{ const s=els.map(e=>e.isConnected?e.outerHTML:'').join('')+ph.className+ph.dataset.screen; if(s===sig) return; sig=s;
+    const ctx=document.createElement('div'); ctx.className='iphone popctx'+(ph.classList.contains('ringing')?' ringing':''); ctx.dataset.screen=ph.dataset.screen||'';
+    ctx.appendChild(scr.cloneNode(true)); inner.replaceChildren(ctx); };
+  sync(); $('#pops').appendChild(w);
+  const fromT=`translate(${src.x-tx}px,${src.y-ty}px) scale(${src.w/Wd})`;
+  w.style.transform=fromT; w.style.opacity='0';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ w.classList.add('in'); w.style.transform='none'; w.style.opacity='1'; }));
+  APP.classList.add('popping');
+  const h={w,fromT,iv:setInterval(sync,140),t0:Date.now(),minHold,tm:null};
+  h.tm=setTimeout(()=>closePop(),hold); pop=h; return h; }
+function closePop(now){ const h=pop; if(!h) return; pop=null; clearInterval(h.iv); clearTimeout(h.tm); APP.classList.remove('popping');
+  if(now){ h.w.remove(); return; } h.w.classList.add('out'); h.w.style.transform=h.fromT; h.w.style.opacity='0'; setTimeout(()=>h.w.remove(),800); }
+function closePopSoon(ms){ const h=pop; if(!h) return; clearTimeout(h.tm); const left=Math.max(ms,h.minHold-(Date.now()-h.t0)); h.tm=setTimeout(()=>{ if(pop===h) closePop(); },left); }
+
+/* ================= scenes ================= */
+function setScene(n){ APP.dataset.scene=n; setStep(SC2STEP[n]??stepIdx);
+  APP.dataset.tone=(n==='alert'||n==='dialing'||n==='ringing')?'alert':(n==='end'?'done':'');
+  $('#calmNote').style.display=n==='calm'?'':'none';
+  if(n!=='signals') caption(n);
+  if(n==='calm'){ setLayout('calm'); camSet('wide'); now('scan',`Watching ${esc(C.company)}'s cash`,'Bank, payroll and invoices · all quiet',0); }
+  if(n==='signals'){ caption('signals'); orb.pulse(.5); now('scan','Scanning cash · 3 days ahead','Bank balance, payroll run, open invoices',8); }
+  if(n==='alert'){ camFocus(null); }
+  if(n==='dialing'){ $('#cause').classList.remove('on'); now('phone','Calling Larry','Mail too slow, push too weak · 3 days left',100,null,'wr'); }
+  if(n==='ringing'){ setLayout('big'); }
+  if(n==='call'){ setLayout('big'); nowOff(); $('#cause').classList.remove('on'); camSet('compact'); STAGE.classList.add('incall'); actsHead('Plan','Preview while WATARI speaks'); }
+  if(n==='work'){ setLayout('calm'); camSet('work'); STAGE.classList.remove('incall'); STAGE.classList.add('working'); $('#mic').classList.remove('on'); actsHead('WATARI at work','Running for Larry, in parallel'); }
+  if(n==='end'){ actsHead('Done','Everything below is live'); if(W.state.ledger.payroll==='covered') coverWithCoins(); renderLedger(); }
+}
+function resetUI(){ covered=false; thinkEl=null; logs.length=0; closePop(true); clearTimeout(camTm);
+  $$('#ticker .ln').forEach(l=>l.remove()); $('#logFull').innerHTML=''; $('#runN').textContent='0 steps';
+  renderGhosts(); $('#gauge').classList.add('ghost'); $('#tlPay .k').innerHTML=`${ic('users')}Next payroll · watching`;
+  ['#fBal','#fGap','#fCred'].forEach(s=>{ const e=$(s); e.style.height='0'; e.style.opacity=''; }); $('#fGap').classList.remove('on'); $('#fCred').style.bottom='0';
+  $('#tlBal').style.opacity=0; const g=$('#tlGap'); g.style.opacity=0; g.classList.remove('cov'); $('#tlPay .v').textContent=''; $('#tlPaySub').textContent=''; $('#covered').classList.remove('on');
+  $('#cause').classList.remove('on'); lines.innerHTML=''; $('#mic').classList.remove('on'); $('#cue').classList.remove('on'); $('#faceWait').classList.remove('on');
+  $('#acts').classList.remove('on'); $('#actsG').innerHTML=''; $('#ledger').classList.remove('on'); $('#ledger').innerHTML='';
+  STAGE.classList.remove('incall','working','cardfocus'); $$('#pring .pt').forEach(p=>p.className='pt'); $('#callT').textContent='00:00';
+  camPt=null; setScene('calm'); setMood('idle','Listening'); setPaused(false); }
+
+/* ================= bus ================= */
+B.on('reset',resetUI);
+B.on('scene',d=>setScene(d.name));
+B.on('mood',d=>setMood(d.mood,d.label));
+B.on('level',d=>{ if(d.who==='watari'){ orb.level(d.v); tgW=Math.max(tgW,d.v||0); } else { tgU=Math.max(tgU,d.v||0); if(d.v>0) $('#mic').classList.add('on'); } });
+B.on('log',addLog);
+B.on('signal',s=>{ const late=s.tone==='late'; light(s.src,late?'warn':'on',late?0:1800);
+  if(s.id==='bal') now(null,'KBC business account',`Balance today · <span class="num">${eur(s.amt)}</span>`,34,'kbc');
+  if(s.id==='pay') now(null,'SD Worx payroll run',`${esc(C.payday)} · ${C.people} people · <span class="num">${eur(Math.abs(s.amt))}</span>`,60,'sdworx');
+  if(!late) camFocus(s.src,1700);
+  const go=()=>linkTo(PL(s.src),$('#orbStage'),{color:late?'#f26a1b':'#00aeef'}).then(()=>{ orb.absorb(angleOf(s.src),22); orb.pulse(.4); renderSig(s); const row=$(`.sig[data-id="${s.id}"]`);
+    if(row) linkTo($('#orbStage'),row,{color:late?'#f26a1b':'#062a5b',dur:550,width:1.6,bend:-.1,keep:150}); if(s.id==='bal') gaugeBal(); if(s.id==='pay') gaugePay(); });
+  if(late) go(); else setTimeout(go,RM?0:720); });
+B.on('gap',g=>{ camFocus(null); gaugeGap(g); orb.pulse(.6); now('alert',`<span class="num">${eur(g.gap)}</span> short on Friday`,'Payroll must never fail',78,null,'wr'); });
+B.on('search',d=>{ setStep(2); caption('cause'); const p=PT(d.src); if(!p) return; camFocus(d.src,1500);
+  now(null,d.src==='attio'?'Searching Attio':'Checking Peppol',esc(d.q),d.src==='attio'?86:94,d.src);
+  const q=p.querySelector('.q'); q.textContent='search · '+d.q; q.classList.add('show'); light(d.src,'on',2400); setTimeout(()=>q.classList.remove('show'),2400);
+  setTimeout(()=>linkTo($('#orbStage'),p.querySelector('.lg'),{color:'#5b4bd6',dur:650}).then(()=>linkTo(p.querySelector('.lg'),$('#orbStage'),{color:'#00aeef',dur:550})),RM?0:700); });
+B.on('cause',c=>{ nowOff(); camFocus('colruyt',0); PT('colruyt').classList.add('warn','seen'); orb.pulse(.8); setTimeout(()=>showCause(c),RM?0:500); });
+B.on('dial',()=>{ camFocus(null); orb.emit(0,30); setLayout('big'); setTimeout(()=>linkTo($('#orbStage'),ph,{color:'#f26a1b',dur:1000,width:3,bend:-.12,keep:1400}),RM?0:950); });
+let callTm=null;
+B.on('call',d=>{ clearInterval(callTm);
+  if(d.status==='ringing') setTimeout(()=>{ if(W.state.call==='ringing'||ph.classList.contains('ringing')) popPhone(['.in-top','.in-orb'],{k:1.45,hold:3000,pad:26,label:'Incoming call on Larry\'s iPhone'}); },RM?0:1100);
+  if(d.status==='active'){ if(pop) closePop(); const st=d.start||Date.now(); callTm=setInterval(()=>{ const s=Math.floor((Date.now()-st)/1000); $('#callT').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); },500); }
+  if(d.status==='ended'){ $('#faceWait').classList.remove('on'); $('#cue').classList.remove('on'); } });
+B.on('say',d=>{ if(d.who==='watari') thinkEl=null; sayLine(d); });
+B.on('say-start',d=>{ const el=lines.querySelector(`[data-sid="${d.sid}"]`); if(el) el.classList.add('speaking'); });
+B.on('say-end',d=>{ const el=lines.querySelector(`[data-sid="${d.sid}"]`); if(el) el.classList.remove('speaking'); });
+B.on('think',d=>{ if(d.start){ thinkEl=null; return; } if(d.step) thinkStep(d.step); });
+B.on('await',d=>{ const fw=(d.accept||[]).includes('approve'); $('#faceWait').classList.toggle('on',fw); requestAnimationFrame(trimLines);
+  if(d.hint && W.state.scene==='call'){ $('#cue').innerHTML=`cue “${esc(d.hint)}” · N`; $('#cue').classList.add('on'); } else $('#cue').classList.remove('on'); });
+B.on('proposal',()=>{ orb.pulse(.5); });
+B.on('action',renderAct);
+B.on('notif',n=>{
+  if(n.id==='approve'&&n.status==='shown') setTimeout(()=>popPhone('.ip-banner',{k:1.6,hold:5200,minHold:2400,label:'KBC Mobile · approval on Larry\'s iPhone'}),RM?0:700);
+  if(n.status==='approved'){ $('#faceWait').classList.remove('on'); light('kbc','on',2000); closePopSoon(1300); }
+  if(n.status==='declined'||n.status==='dismissed') closePopSoon(300);
+  if(n.lock && n.app==='watari') setTimeout(()=>popPhone('.lk-stack',{k:1.45,hold:3200,label:'Lock screen · Larry\'s iPhone'}),RM?0:1000); });
+B.on('ledger',()=>{ if(W.state.scene==='end') renderLedger(); });
+function updLink(){ const on=W.phoneLinked(); const d=$('#ldot'); d.classList.toggle('on',on); d.dataset.tip=on?'Phone linked · sound on phone':'Rehearsal · sound on laptop'; }
+B.on('peers',updLink); setInterval(updLink,1500);
+B.on('armed',()=>{ armed=true; renderTools(); });
+B.on('auto',()=>renderTools());
+B.on('backup',()=>{ const o=$('#bkOv'); o.classList.add('on'); const v=$('#backup'); if(!v.getAttribute('src')) v.src=v.dataset.src; try{ const p=v.play(); if(p&&p.catch) p.catch(()=>{}); }catch(e){} });
+B.on('pause',d=>{ if(d&&typeof d.on==='boolean') setPaused(d.on); });
+$('#backup').addEventListener('error',()=>{ $('#bkL').textContent='Backup video · put backup.mp4 next to this file · Esc to close'; });
+$('#backup').addEventListener('playing',()=>{ $('#bkL').textContent=''; });
+
+/* ================= header controls ================= */
+let paused=false, armed=false;
+function setPaused(p){ paused=!!p; APP.classList.toggle('paused',paused); setIcons(); }
+function doPause(want){ const E=W.engine; const cur=typeof E.paused==='boolean'?E.paused:paused; const p=typeof want==='boolean'?want:!cur; if(p===cur) return;
+  if(E.pause) E.pause(p); else B.emit('input',{type:'pause',on:p});
+  setPaused(p); }
+const isIdle=()=>['calm','end'].includes(W.state.scene)&&!W.engine.running;
+function setIcons(){ const sc=W.state.scene; $('#bPlay').innerHTML=`<svg class="i" viewBox="0 0 24 24">${sc==='end'?ICO.re:(paused||isIdle())?ICO.play:ICO.pause}</svg>`; $('#bNext').innerHTML=`<svg class="i" viewBox="0 0 24 24">${ICO.next}</svg>`; $('#bRe').innerHTML=`<svg class="i" viewBox="0 0 24 24">${ICO.re}</svg>`; }
+setInterval(setIcons,700);
+function play(){ if(isIdle()||W.state.scene==='end'){ setPaused(false); W.engine.start(); } else doPause(); setTimeout(setIcons,60); }
+function next(){ const E=W.engine; if(isIdle()) return E.start(); if(W.state.call==='ringing') return E.answer();
+  if(E.pend){ if((E.pend.accept||[]).includes('approve')) return E.approve(); if(E.pend.hint) return E.simNext(); } }
+$('#bPlay').onclick=e=>{ e.currentTarget.blur(); play(); };
+$('#bNext').onclick=e=>{ e.currentTarget.blur(); next(); };
+$('#bRe').onclick=e=>{ e.currentTarget.blur(); B.emit('input',{type:'reset'}); };
+
+/* ================= operator tools (hidden almost) ================= */
+const TOOLS=[['start','Start / answer','Space'],['next','Next line','N'],['approve','Approve','Y'],['hang','Hang up','H'],['auto','Auto voice','M'],['type','Type a line','T'],['log','Log','L'],['reset','Reset','R'],['arm','Arm audio','U'],['backup','Backup video','B'],['keys','All keys','?']];
+function renderTools(){ $('#toolsP').innerHTML=TOOLS.map(([k,l,kb])=>{ const st=k==='auto'?(W.engine.auto?' on':''):k==='arm'?(armed?' on':''):''; const lab=k==='auto'?`Auto voice · ${W.engine.auto?'on':'off'}`:k==='arm'&&armed?'Audio armed':l;
+  return `<button data-t="${k}" class="${st}"><span>${lab}</span><kbd>${kb}</kbd></button>`; }).join(''); }
+renderTools();
+const key=k=>window.dispatchEvent(new KeyboardEvent('keydown',{key:k,bubbles:true}));
+$('#toolsP').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; b.blur(); const t=b.dataset.t;
+  ({start:()=>key(' '),next:()=>key('n'),approve:()=>key('y'),hang:()=>key('h'),auto:()=>key('m'),type:()=>W.promptLine(),log:toggleLog,reset:()=>key('r'),arm:()=>key('u'),backup:()=>key('b'),keys:()=>$('#helpOv').classList.add('on')})[t](); setTimeout(renderTools,50); });
+$('#toolsB').addEventListener('click',e=>{ e.currentTarget.blur(); $('#tools').classList.toggle('open'); });
+document.addEventListener('click',e=>{ if(!e.target.closest('#tools')) $('#tools').classList.remove('open');
+  if(e.target.closest('[data-close]')||(e.target.classList.contains('ov')&&e.target.id!=='bkOv')){ const o=e.target.closest('.ov'); o&&o.classList.remove('on'); } });
+
+const KEYS=[['Space','Start · answer the call'],['A','Answer'],['N','Speak next scripted line (auto off)'],['Y','Approve credit line'],['H','Hang up'],['P','Pause / resume'],['R','Reset to calm'],['M','Auto user voice on/off'],['T','Type your own line'],['U','Arm audio'],['B','Backup video'],['L','Execution log'],['?','This sheet'],['Esc','Close overlays']];
+$('#keyList').innerHTML=KEYS.map(([k,t])=>`<div class="kr"><kbd>${k}</kbd>${t}</div>`).join('');
+
+/* type a line */
+W.promptLine=()=>{ const b=$('#typeBox'); b.classList.add('on'); const i=$('#typeIn'); i.value=''; i.focus(); };
+addEventListener('keydown',e=>{ if((e.key==='t'||e.key==='T') && !/input|textarea/i.test(e.target.tagName)) e.preventDefault(); },true);
+$('#typeIn').addEventListener('keydown',e=>{ if(e.key==='Enter'){ const t=e.target.value.trim(); $('#typeBox').classList.remove('on'); e.target.blur(); if(t){ if(W.engine.pend) W.engine.say(t); else addLog({kind:'block',text:'typed line ignored · WATARI is not waiting for Larry',detail:t,t:Date.now()}); } }
+  if(e.key==='Escape'){ $('#typeBox').classList.remove('on'); e.target.blur(); } e.stopPropagation(); });
+
+/* page keys (core handles the story keys) */
+addEventListener('keydown',e=>{ if(/input|textarea/i.test(e.target.tagName)) return; const k=e.key;
+  if(k==='Escape'){ $$('.ov.on').forEach(o=>o.classList.remove('on')); try{ $('#backup').pause(); }catch(_){} $('#runp').classList.remove('on'); $('#typeBox').classList.remove('on'); $('#tools').classList.remove('open'); }
+  if(k==='?'||(k==='/'&&e.shiftKey)) $('#helpOv').classList.toggle('on');
+  if(k==='l'||k==='L') toggleLog();
+  if(k==='p'||k==='P') setTimeout(()=>setPaused(!!W.engine.paused),30); /* the engine owns P */
+  if(k===' ') setTimeout(setIcons,60);
+  if(k==='m'||k==='M'||k==='u'||k==='U') setTimeout(renderTools,60);
+});
+
+/* tooltips */
+const tip=$('#tip');
+document.addEventListener('mouseover',e=>{ const t=e.target.closest('[data-tip]'); if(!t){ tip.classList.remove('on'); return; } tip.innerHTML=t.dataset.tip; tip.classList.add('on'); });
+document.addEventListener('mousemove',e=>{ if(!tip.classList.contains('on')) return; const w=tip.offsetWidth,h=tip.offsetHeight; let x=e.clientX+14,y=e.clientY+16; if(x+w>innerWidth-8) x=e.clientX-w-14; if(y+h>innerHeight-8) y=e.clientY-h-12; tip.style.left=x+'px'; tip.style.top=y+'px'; });
+
+/* shell bridge hooks (see /app/bridge.js): inside the pitch shell nothing starts on its own */
+window.WATARI_STEP={
+  start(){ if(paused) return doPause(false); W.engine.start(); },
+  reset(){ B.emit('input',{type:'reset'}); },
+  pause(){ doPause(true); }
+};
+
+/* boot */
+resetUI(); updLink(); setIcons();
+})();
+</script>
+<script src="/app/bridge.js"></script>
+</body>
+</html>

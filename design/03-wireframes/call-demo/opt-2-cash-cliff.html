@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="en" data-role="stage">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Watari Cash Cliff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="core/phone.css">
+<style>
+@property --s{syntax:'<number>';inherits:true;initial-value:.8}
+:root{
+  --navy:#003665;--cyan:#00AEEF;--ink:#0B1F33;--ink2:#4A5D73;--ink3:#8494A7;--line:#DCE3EC;--bg:#F4F7FB;--card:#fff;
+  --ai:#5B3FD1;--ai-bg:#EFEBFD;--alert:#FF7A00;--alert-bg:#FFF2E6;--ok:#12B76A;--ok-bg:#E7F8EF;
+  --fd:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;--fb:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;--fm:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --phw:25vw;
+}
+*{box-sizing:border-box}
+html{font-size:min(1.4815vh,.8333vw)}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--fb);font-size:1rem;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+.ic{width:1.1em;height:1.1em;stroke-width:2.2;vertical-align:-.15em}
+.mono,.num{font-family:var(--fm);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.wlogo{width:var(--ws,2.4rem)!important;height:var(--ws,2.4rem)!important;font-size:calc(var(--ws,2.4rem)*.36)!important;display:inline-grid;place-items:center;border-radius:8px;background:var(--lg);color:var(--lf);font-weight:800;overflow:hidden;flex:none;box-shadow:0 0 0 1px rgba(11,31,51,.08)}
+.wlogo img{width:100%;height:100%;object-fit:contain}.wlogo img+b{display:none}
+#k-overlay{position:fixed;inset:0;pointer-events:none;z-index:90;overflow:visible;width:100%;height:100%}
+.flyer{position:fixed;left:0;top:0;pointer-events:none;z-index:95}
+.flyer{opacity:0}.flyer.coin{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe27a,#f5b700 60%,#c98f00);display:grid;place-items:center;font-size:11px;font-weight:800;color:#7a5500}
+.ai-tag{display:inline-flex;align-items:center;gap:.2rem;font:600 .7rem/1 var(--fm);color:var(--ai);background:var(--ai-bg);border-radius:.35rem;padding:.22rem .38rem;letter-spacing:.04em;flex:none}
+
+/* ---------- header (2.I) ---------- */
+header{height:4.4rem;display:flex;align-items:center;gap:1.5rem;padding:0 1.75rem;background:#fff;border-bottom:1px solid var(--line);position:relative}
+.mark{display:flex;align-items:center;gap:.7rem;font-family:var(--fd);font-weight:800;font-size:1.45rem;letter-spacing:.02em;color:var(--navy)}
+.mark i{width:1.6rem;height:1.6rem;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff,#00aeef 45%,#2f6bff 80%);box-shadow:0 0 .8rem rgba(0,174,239,.5)}
+.mark small{font:500 1rem var(--fb);color:var(--ink2);letter-spacing:0}
+.mark small b{color:var(--navy);font-weight:700}
+.steps{display:flex;align-items:center;gap:.35rem;margin:0 auto}
+.step{display:flex;align-items:center;gap:.45rem;padding:.5rem .85rem;border-radius:2rem;font-weight:600;font-size:1rem;color:var(--ink3);transition:all .4s}
+.step .ic{width:1rem;height:1rem}
+.step.done{color:var(--ink2)}
+.step.on{background:var(--navy);color:#fff}
+.step.on.alert{background:var(--alert)}
+.step.on.good{background:var(--ok)}
+.sep{width:1.2rem;height:1px;background:var(--line)}
+.hr{display:flex;align-items:center;gap:.6rem}
+.chip{display:inline-flex;align-items:center;gap:.4rem;height:2.3rem;padding:0 .8rem;border-radius:2rem;border:1px solid var(--line);background:#fff;font-size:.88rem;font-weight:500;color:var(--ink2);white-space:nowrap}
+.chip .dot{width:.5rem;height:.5rem;border-radius:50%;background:var(--ink3)}
+.chip.linked .dot{background:var(--ok);box-shadow:0 0 0 .2rem var(--ok-bg)}
+.chip.var{color:var(--ai);border-color:#d9d1fa;background:#faf8ff;cursor:pointer}
+.btn{height:2.5rem;padding:0 1rem;border-radius:.7rem;border:1px solid var(--line);background:#fff;font-weight:600;font-size:.95rem;display:inline-flex;align-items:center;gap:.45rem}
+.btn:hover{border-color:var(--ink3)}
+.btn.pri{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.armed{color:var(--ok);border-color:#bfe9d3}
+.btn.q{width:2.5rem;padding:0;justify-content:center}
+
+/* ---------- main grid ---------- */
+main{height:calc(100% - 4.4rem);display:grid;grid-template-columns:minmax(0,1fr) var(--phw);gap:1.6rem;padding:1.3rem 1.75rem 1.3rem;transition:grid-template-columns .9s cubic-bezier(.5,0,.2,1)}
+body.big main{grid-template-columns:minmax(0,1fr) 33vw}
+body.mid main{grid-template-columns:minmax(0,1fr) 27vw}
+.left{display:grid;grid-template-rows:minmax(0,1fr) 25.5rem 8.6rem;gap:1.1rem;min-width:0;min-height:0}
+.top{display:grid;grid-template-columns:22rem minmax(0,1fr);gap:1.4rem;min-height:0}
+.box{background:var(--card);border:1px solid var(--line);border-radius:1.2rem;position:relative}
+
+/* ---------- 2.A orb ---------- */
+.orbz{display:flex;flex-direction:column;align-items:center;min-height:0;padding:.6rem .6rem .8rem}
+.orbwrap{position:relative;flex:1 1 0;min-height:0;aspect-ratio:1;max-width:100%;margin-top:-.3rem}
+.orbwrap canvas{position:absolute;inset:0;width:100%;height:100%}
+.moodl{margin-top:-.6rem;font-family:var(--fd);font-weight:700;font-size:1.25rem;color:var(--ink);display:flex;align-items:center;gap:.5rem;transition:color .4s}
+.moodl .pip{width:.6rem;height:.6rem;border-radius:50%;background:var(--cyan)}
+body[data-mood=alert] .moodl{color:var(--alert)}body[data-mood=alert] .moodl .pip{background:var(--alert)}
+body[data-mood=thinking] .moodl .pip,body[data-mood=listening] .moodl .pip{background:var(--ai)}
+body[data-mood=done] .moodl .pip,body[data-mood=focus] .moodl .pip{background:var(--ok)}
+.mic{white-space:nowrap;position:absolute;left:50%;top:1rem;translate:-50% 0;z-index:3;height:2rem;display:flex;align-items:center;gap:.45rem;padding:0 .8rem;border-radius:2rem;background:var(--ai-bg);color:var(--ai);font-weight:600;font-size:.9rem;opacity:0;transform:translateY(.3rem);transition:all .25s}
+.mic.on{opacity:1;transform:none}
+.mic .bars{display:flex;gap:2px;align-items:center;height:1rem}
+.mic .bars i{width:3px;border-radius:2px;background:var(--ai);height:20%;transition:height .08s}
+/* 2.B partners */
+.partners{display:flex;gap:.5rem;margin-top:.5rem;flex:none}
+.partners{--ws:2.5rem}.partners .p{position:relative;transition:transform .3s,opacity .3s;opacity:.55}
+.partners .p.lit{opacity:1;transform:translateY(-.15rem)}
+.partners .p.bump{animation:bump .4s}
+@keyframes bump{50%{transform:scale(1.18)}}
+
+/* ---------- 2.C feed ---------- */
+.feed{padding:1.3rem 1.5rem;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.kick{font:600 .85rem var(--fb);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:.5rem}
+.head{font-family:var(--fd);font-weight:800;font-size:2.9rem;line-height:1.02;letter-spacing:-.02em;margin:.35rem 0 .3rem;color:var(--ink);transition:color .4s}
+.head.alert{color:var(--alert)}.head.good{color:var(--ok)}
+.headsub{font-size:1.15rem;color:var(--ink2);min-height:1.5rem}
+.cards{margin-top:1rem;display:grid;grid-template-columns:1fr 1fr;gap:.7rem;align-content:start;min-height:0}
+.card{display:flex;align-items:center;gap:.8rem;padding:.75rem .9rem;border:1px solid var(--line);border-radius:.9rem;background:#fff;animation:cin .5s cubic-bezier(.2,1.1,.4,1) both;min-width:0;position:relative}
+@keyframes cin{from{opacity:0;transform:translateX(-1.2rem)}}
+.card{--ws:2.4rem}.card .t{font-weight:600;font-size:1.02rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .s{font-size:.88rem;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:.1rem}
+.card .tx{min-width:0;flex:1}
+.card .amt{font:600 1.3rem var(--fm);font-variant-numeric:tabular-nums;white-space:nowrap}
+.card .amt.neg{color:var(--alert)}.card .amt.pos{color:var(--navy)}.card .amt.late{color:#c2410c}
+.card .st{flex:none;display:inline-flex;align-items:center;gap:.3rem;font:600 .78rem var(--fm);padding:.3rem .5rem;border-radius:.4rem;background:#eef2f7;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em}
+.card.preview{border-style:dashed;background:#fbfdff}
+.card.preview .st{background:#e6f7fd;color:#0077a8}
+.card.running .st{background:var(--ai-bg);color:var(--ai)}
+.card.done .st{background:var(--ok-bg);color:#0a7a47}
+.card.click{cursor:pointer}.card.click:hover{border-color:var(--ink3)}
+.card .more{font-size:.78rem;color:var(--ai);font-weight:600;margin-left:.3rem}
+.card.search{grid-column:1/-1;background:#faf8ff;border-color:#e3dcfb}
+.spin{width:1rem;height:1rem;border:2px solid #d9d1fa;border-top-color:var(--ai);border-radius:50%;animation:sp .8s linear infinite;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* 2c transcript */
+.trans{display:none;flex-direction:column;gap:.6rem;margin-top:.8rem;overflow:hidden;justify-content:flex-end;min-height:0;flex:1}
+.tl{display:flex;gap:.6rem;align-items:flex-start;font-size:1.25rem;line-height:1.35}
+.tl .who{flex:none;font:600 .8rem var(--fm);padding:.3rem .5rem;border-radius:.4rem;margin-top:.15rem}
+.tl.watari .who{background:var(--ai-bg);color:var(--ai)}.tl.watari .tx{color:var(--ai)}
+.tl.user .who{background:#e6eef7;color:var(--navy)}
+.tl.partial .tx::after{content:"▍";color:var(--ai);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+body.v2c.calling .trans{display:flex}
+body.v2c.calling .cards{display:none}
+
+/* ---------- 2.D chart ---------- */
+.chart{padding:1rem 1.5rem .7rem;display:flex;flex-direction:column;min-height:0}
+.ch-h{display:flex;align-items:center;gap:1rem}
+.ch-h h2{margin:0;font-family:var(--fd);font-weight:800;font-size:1.55rem;letter-spacing:-.01em}
+.ch-h .today{font:500 .95rem var(--fm);color:var(--ink2)}
+.legend{margin-left:auto;display:flex;gap:1rem;font-size:.9rem;color:var(--ink2)}
+.legend span{display:inline-flex;align-items:center;gap:.4rem;transition:opacity .4s}
+.legend i{width:1rem;height:.7rem;border-radius:.2rem;display:inline-block}
+.lg-bal{background:linear-gradient(180deg,#2f6aa3,#003665)}
+.lg-void{background:repeating-linear-gradient(135deg,var(--alert) 0 3px,#ffd7b0 3px 6px)}
+.lg-ghost{border:2px dashed #e3000f}
+.lg-kbc{background:var(--cyan)}
+.legend .off{opacity:0}
+.runway{flex:1;display:grid;grid-template-columns:7.5rem minmax(0,1fr);min-height:0;margin-top:.5rem}
+.yax{position:relative}
+.yl{position:absolute;right:.8rem;transform:translateY(-50%);font:600 1rem var(--fm);color:var(--ink3);white-space:nowrap;transition:opacity .4s}
+.yl.z{color:var(--ink)}
+.plotw{display:flex;flex-direction:column;min-height:0}
+.plot{position:relative;flex:1;min-height:0}
+.xax{height:2rem;position:relative}
+.xl{position:absolute;top:.35rem;font:600 1rem var(--fb);color:var(--ink2);transform:translateX(-50%);white-space:nowrap}
+.xl.pay{color:var(--ink)}.xl b{font-weight:700}
+.gl{position:absolute;left:0;right:0;height:0;border-top:1px dashed var(--line)}
+.gl.zero{border-top:2px solid var(--ink)}
+.gl.payl{border-top:2px dashed #9fb0c3;opacity:0;transition:opacity .5s}
+.f-pay .gl.payl{opacity:1}
+.payl-lbl{position:absolute;right:0;transform:translateY(-110%);font:600 .95rem var(--fm);color:var(--ink2);opacity:0;transition:opacity .5s;white-space:nowrap}
+.f-pay .payl-lbl{opacity:1}
+.daycol{position:absolute;top:0;bottom:0;border-left:1px solid #edf1f6}
+.daycol.payday{background:linear-gradient(180deg,rgba(255,122,0,0),rgba(255,122,0,.04));border-left:1px dashed #f3c79d}
+.bal{position:absolute;left:0;border-radius:.5rem .5rem 0 0;background:linear-gradient(180deg,#2f6aa3,#003665);width:0;transition:width 1.1s cubic-bezier(.5,0,.2,1);overflow:hidden;color:#fff;display:flex;align-items:center}
+.f-bal .bal{width:var(--bw)}
+.bal .lb{margin-left:1.4rem;font-size:1.05rem;opacity:.85;white-space:nowrap}
+.bal .v{font:600 2.6rem var(--fm);margin-left:.9rem;white-space:nowrap}
+.pbar{position:absolute;opacity:0;transform:translateY(-1rem);transition:all .7s cubic-bezier(.3,1.2,.4,1)}
+.f-pay .pbar{opacity:1;transform:none}
+.pbar .top{position:absolute;left:0;right:0;top:0;background:repeating-linear-gradient(0deg,#2f6aa3 0 2px,#003665 2px 10px);border-radius:.4rem .4rem 0 0}
+.pbar .void{position:absolute;left:0;right:0;bottom:0;border:2px dashed #c9d3df;border-top:0;border-radius:0 0 .4rem .4rem;transition:all .5s;overflow:hidden}
+.f-gap .pbar .void{border-color:var(--alert);background:repeating-linear-gradient(135deg,rgba(255,122,0,.85) 0 6px,rgba(255,122,0,.12) 6px 14px)}
+.f-gap .pbar .void{animation:voidp 1.6s ease-in-out infinite}
+@keyframes voidp{50%{box-shadow:0 0 0 .5rem rgba(255,122,0,.15)}}
+.pbar .ptag{position:absolute;left:50%;transform:translate(-50%,-100%);top:-.4rem;display:flex;align-items:center;gap:.4rem;background:#fff;border:1px solid var(--line);border-radius:.6rem;padding:.3rem .55rem;white-space:nowrap;font-size:.92rem;font-weight:600;box-shadow:0 4px 12px rgba(11,31,51,.06)}
+.pbar .ptag .num{color:var(--alert)}
+.bridge{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#fff;font-weight:700;font-size:1rem;line-height:1.15;opacity:0;transition:all .6s;background:rgba(232,248,254,.94);border:2px dashed var(--cyan);color:#0077a8;transform:translateY(-40%)}
+.f-prop .bridge{opacity:1;transform:none}
+.f-bridge .bridge{background:var(--cyan);color:#fff;border-style:solid}
+.f-covered .bridge{background:var(--ok);border-color:var(--ok);color:#fff}
+.f-bridge .pbar .void,.f-covered .pbar .void{animation:none;border-color:transparent}
+.bridge .num{font-size:1.15rem;display:block}
+.cost{position:absolute;display:flex;align-items:center;gap:.4rem;padding:.4rem .6rem;border-radius:.6rem;background:#fff;border:1px solid #bfe7f8;font-weight:600;font-size:.95rem;color:#0077a8;opacity:0;transform:translateX(-.6rem);transition:all .5s .4s;white-space:nowrap}
+.cost .num{font-size:1.15rem;color:var(--ink)}
+.f-prop .cost{opacity:1;transform:none}
+.gaplbl{position:absolute;text-align:right;opacity:0;transition:opacity .6s .2s;pointer-events:none}
+.f-gap .gaplbl{opacity:1}
+.gaplbl .big{font-family:var(--fm);font-weight:600;font-size:3.6rem;line-height:1;color:var(--alert);letter-spacing:-.03em;white-space:nowrap}
+.gaplbl .big em{font-style:normal;font-family:var(--fd);font-weight:800;font-size:2.6rem;letter-spacing:-.01em}
+.gaplbl .sub{font-size:.98rem;color:var(--ink2);margin-top:.3rem}
+.gaplbl .arr{display:inline-block;margin-left:.6rem;color:var(--alert)}
+.gaplbl .ok{display:none;color:var(--ok)}
+.f-covered .gaplbl .big,.f-covered .gaplbl .sub.a{display:none}
+.f-covered .gaplbl .ok{display:block}
+.ghost{position:absolute;left:0;border:2.5px dashed #e3000f;border-bottom:0;border-radius:.6rem .6rem 0 0;background:rgba(227,0,15,.035);display:flex;align-items:center;gap:.9rem;padding:0 1.2rem;opacity:0;transform:translateY(-1.5rem) scale(.98);transition:all .7s cubic-bezier(.3,1.3,.4,1);overflow:hidden}
+.f-cause .ghost{opacity:1;transform:none}
+.ghost .t{font-weight:600;font-size:1.15rem;white-space:nowrap}
+.ghost .num{font-weight:600;font-size:1.6rem;color:#c3000d;white-space:nowrap}
+.ghost .exp{font:600 .8rem var(--fm);text-transform:uppercase;letter-spacing:.06em;color:#c3000d;background:#fdecee;border-radius:.4rem;padding:.3rem .5rem;white-space:nowrap}
+.ghost .chase{margin-left:auto;display:flex;align-items:center;gap:.4rem;color:#0077a8;font-weight:700;font-size:1rem;white-space:nowrap;opacity:0;transition:opacity .5s .6s}
+.f-prop .ghost .chase{opacity:1}
+.f-prop .ghost .exp{display:none}
+.f-chase .ghost .chase{color:var(--ok)}
+.ghost .chase .done{display:none}.f-chase .ghost .chase .done{display:inline}.f-chase .ghost .chase .todo{display:none}
+.anns{position:absolute;inset:0;pointer-events:none}
+.ann{position:absolute;transform:translate(-50%,-100%);display:flex;align-items:center;gap:.45rem;padding:.4rem .6rem;border-radius:.6rem;background:#fff;border:1px solid #d9d1fa;color:var(--ai);font-weight:600;font-size:1rem;white-space:nowrap;box-shadow:0 6px 18px rgba(91,63,209,.12);animation:annin .45s cubic-bezier(.2,1.3,.4,1) both;z-index:3}
+.ann::after{content:"";position:absolute;left:50%;bottom:-.45rem;width:.8rem;height:.8rem;background:#fff;border-right:1px solid #d9d1fa;border-bottom:1px solid #d9d1fa;transform:translateX(-50%) rotate(45deg)}
+.ann.old{opacity:.55}
+@keyframes annin{from{opacity:0;transform:translate(-50%,-70%)}}
+.empty{position:absolute;left:0;right:0;top:30%;text-align:center;color:var(--ink3);font-size:1.1rem;transition:opacity .4s}
+.f-bal .empty{opacity:0}
+
+/* 2b gauge */
+.gauge{display:none;flex:1;flex-direction:column;justify-content:center;padding:0 1rem;min-height:0}
+body.v2b .runway{display:none}body.v2b .gauge{display:flex}
+
+.g-top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:.6rem;opacity:0;transition:opacity .5s}
+.f-pay .g-top{opacity:1}
+.g-top .l{font-size:1.15rem;color:var(--ink2);display:flex;align-items:center;gap:.5rem}
+.g-top .num{font-size:2rem;font-weight:600}
+.g-brk{height:.8rem;border:2px solid #9fb0c3;border-bottom:0;border-radius:.4rem .4rem 0 0;opacity:0;transition:opacity .5s}
+.f-pay .g-brk{opacity:1}
+.g-track{position:relative;height:9rem;border-radius:1rem;background:#eef2f7;overflow:hidden;display:flex}
+.g-bal{width:0;background:linear-gradient(180deg,#2f6aa3,#003665);color:#fff;display:flex;flex-direction:column;justify-content:center;padding-left:1.6rem;transition:width 1.1s cubic-bezier(.5,0,.2,1);overflow:hidden;white-space:nowrap}
+.f-bal .g-bal{width:var(--gb)}
+.g-bal .num{font-size:3rem;font-weight:600}
+.g-void{flex:1;position:relative;display:flex;flex-direction:column;justify-content:center;padding-left:1.6rem;transition:all .5s;white-space:nowrap}
+.f-gap .g-void{background:repeating-linear-gradient(135deg,rgba(255,122,0,.85) 0 7px,rgba(255,122,0,.12) 7px 16px)}
+.g-gap{text-align:right;margin-top:.6rem;min-height:4rem;opacity:0;transition:opacity .5s}.f-gap .g-gap{opacity:1}
+.g-gap .big{font:600 3rem/1 var(--fm);color:var(--alert);white-space:nowrap}.g-gap .big em{font:800 2.4rem var(--fd);font-style:normal}
+.g-gap .okl{display:none;font:600 2rem var(--fb);color:var(--ok);white-space:nowrap}.g-gap .okl em{font:800 2.6rem var(--fd);font-style:normal}
+.f-covered .g-gap .big{display:none}.f-covered .g-gap .okl{display:block}
+.g-void .gh{position:absolute;inset:.6rem;border:2.5px dashed #e3000f;border-radius:.7rem;background:rgba(255,255,255,.85);display:flex;align-items:center;gap:.8rem;padding:0 1.2rem;opacity:0;transition:opacity .5s}
+.f-cause .g-void .gh{opacity:1}
+.f-prop .g-void .gh{opacity:0}
+.g-void .gh .num{font-size:1.8rem;color:#c3000d;font-weight:600}
+.g-void .gb2{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:.8rem;font-weight:700;font-size:1.4rem;opacity:0;transition:all .6s;background:rgba(232,248,254,.96);border:3px dashed var(--cyan);color:#0077a8;border-radius:0 1rem 1rem 0}
+.f-prop .g-void .gb2{opacity:1}
+.f-bridge .g-void .gb2{background:var(--cyan);color:#fff;border-style:solid}
+.f-covered .g-void .gb2{background:var(--ok);border-color:var(--ok);color:#fff}
+.g-void .gb2 .num{font-size:2rem}
+.g-bot{display:flex;justify-content:space-between;margin-top:.7rem;font-size:1.05rem;color:var(--ink2)}
+.g-bot .cost2{opacity:0;transition:opacity .5s;color:#0077a8;font-weight:600}
+.f-prop .g-bot .cost2{opacity:1}
+
+/* ---------- 2.F band ---------- */
+.band{padding:0 1.6rem;display:flex;align-items:center;gap:1.3rem;overflow:hidden}
+.band .calm{display:flex;align-items:center;gap:1rem;font-size:1.2rem;color:var(--ink2)}
+.band .calm b{color:var(--ink)}
+.sub{flex:1;display:none;align-items:center;gap:1.3rem;min-width:0;height:100%}
+.calling .sub{display:flex}.calling .band .calm{display:none}
+.spk{flex:none;width:9rem;display:flex;flex-direction:column;align-items:center;gap:.35rem}
+.spk .badge{height:3.6rem;width:3.6rem;border-radius:50%;display:grid;place-items:center;transition:all .3s}
+.spk.watari .badge{background:radial-gradient(circle at 38% 32%,#fff,#00aeef 45%,#2f6bff 85%);box-shadow:0 0 1.2rem rgba(0,174,239,.45)}
+.spk.user .badge{background:var(--navy);color:#fff}
+.spk.user .badge .ic{width:1.6rem;height:1.6rem}
+.spk.watari .badge .ic{display:none}
+.spk .nm{font:600 .85rem var(--fm);letter-spacing:.04em;text-transform:uppercase;color:var(--ink2);display:flex;gap:.35rem;align-items:center}
+.wave{height:1.4rem;display:flex;align-items:center;gap:3px}
+.wave i{width:4px;border-radius:2px;background:var(--cyan);height:15%}
+.spk.user .wave i{background:var(--navy)}
+.subtx{flex:1;min-width:0;height:calc(2.15rem*1.22*2);overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+.subtx p{margin:0;font-family:var(--fd);font-weight:600;font-size:2.15rem;line-height:1.22;letter-spacing:-.01em}
+.subtx.watari p{color:var(--ai)}
+.subtx.user p{color:var(--ink)}
+.subtx p .w{display:none}.subtx p .w.v{display:inline}
+.subtx p .last{background:linear-gradient(transparent 60%,rgba(0,174,239,.25) 60%)}
+.think{flex:none;max-width:22rem;display:none;flex-direction:column;gap:.3rem;padding:.7rem .9rem;border-radius:.9rem;background:#faf8ff;border:1px solid #e3dcfb}
+.think.on{display:flex}
+.think .h{display:flex;align-items:center;gap:.5rem;font-weight:700;color:var(--ai);font-size:.95rem}
+.think .ln{font:500 .9rem var(--fm);color:var(--ai);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cue{position:absolute;right:1rem;bottom:.45rem;font:500 .75rem var(--fm);color:var(--ink3);white-space:nowrap}
+.ticker{flex:1;display:none;align-items:center;gap:1.2rem;min-width:0}
+.ticking .ticker{display:flex}.ticking .band .calm{display:none}
+.ticker .tt{font-family:var(--fd);font-weight:700;font-size:2rem;line-height:1.15;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ticker .td{font:500 1.05rem var(--fm);color:var(--ink2);margin-top:.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ticker .tx{min-width:0;flex:1;animation:cin .4s both}
+.ticker .tk{font:600 .78rem var(--fm);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-bottom:.2rem}
+.ticker.alert .tt{color:var(--alert)}.ticker.good .tt{color:var(--ink)}
+.outc{display:none;flex:1;grid-template-columns:repeat(3,1fr);gap:1.2rem;height:100%;padding:1rem 0}
+.ended .outc{display:grid}.ended .sub,.ended .band .calm,.ended .ticker{display:none!important}
+.oc{display:flex;align-items:center;gap:1rem;padding:0 1.2rem;border-radius:.9rem;background:var(--bg);animation:cin .6s both}
+.oc:nth-child(2){animation-delay:.15s}.oc:nth-child(3){animation-delay:.3s}
+.oc .ico{width:3rem;height:3rem;border-radius:.8rem;background:#fff;display:grid;place-items:center;color:var(--navy);flex:none;box-shadow:0 0 0 1px var(--line)}
+.oc .k{font:600 .78rem var(--fm);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3)}
+.oc .l{font-size:1rem;color:var(--ink2);line-height:1.25}
+.oc .num{font-size:1.75rem;font-weight:600;color:var(--ink)}
+.oc .num.g{color:var(--ok)}
+/* 2c band: action strip */
+.astrip{display:none;flex:1;gap:.8rem;align-items:center;min-width:0}
+body.v2c.calling .astrip{display:flex}body.v2c.calling .sub{display:none}
+body.v2c.calling:not(.ended) .band .calm{display:none}
+.astrip .card{flex:1;animation:none}
+
+/* ---------- 2.G log ---------- */
+.logpill{flex:none;margin-top:.55rem;width:100%;display:flex;align-items:center;gap:.5rem;padding:.45rem .7rem;border-radius:.7rem;border:1px solid var(--line);background:var(--bg);font:500 .8rem var(--fm);color:var(--ink2);min-width:0}
+.logpill .lt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.logpill .n{color:var(--ink3)}
+.drawer{position:fixed;left:1.75rem;top:6rem;width:38rem;max-height:calc(100% - 8rem);background:#fff;border:1px solid var(--line);border-radius:1rem;box-shadow:0 20px 60px rgba(11,31,51,.18);z-index:80;display:none;flex-direction:column}
+.drawer.on{display:flex}
+.drawer .dh{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.1rem;border-bottom:1px solid var(--line);font-weight:700}
+.drawer ol{list-style:none;margin:0;padding:.6rem 1.1rem;overflow:auto;font:500 .85rem/1.5 var(--fm)}
+.drawer li{display:flex;gap:.6rem;padding:.15rem 0}
+.drawer li .k{flex:none;width:4.4rem;text-transform:uppercase;font-size:.72rem;color:var(--ink3);padding-top:.1rem}
+.drawer li.think .k,.drawer li.think .x{color:var(--ai)}
+.drawer li.phase .x{font-weight:600;color:var(--navy)}
+.drawer li .d{color:var(--ink3)}
+
+/* ---------- 2.H phone ---------- */
+.phz{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0}
+.phglow{position:absolute;left:50%;top:50%;width:80%;height:80%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(0,174,239,.35),rgba(0,174,239,0));opacity:0;transition:opacity .8s;pointer-events:none}
+body.big .phglow{opacity:1}
+body[data-scene=ringing] .phglow{animation:glow 1.4s ease-in-out infinite;background:radial-gradient(closest-side,rgba(255,122,0,.35),rgba(255,122,0,0))}
+body[data-scene=dialing] .phglow{background:radial-gradient(closest-side,rgba(255,122,0,.3),rgba(255,122,0,0))}
+@keyframes glow{50%{transform:translate(-50%,-50%) scale(1.08);opacity:.7}}
+#ph{transition:--s .9s cubic-bezier(.5,0,.2,1);position:relative;z-index:2}
+.phcap{margin-top:.8rem;font-size:.9rem;color:var(--ink3);display:flex;align-items:center;gap:.4rem;z-index:2}
+
+/* ---------- overlays ---------- */
+#tip{position:fixed;z-index:200;max-width:22rem;padding:.55rem .75rem;border-radius:.6rem;background:var(--ink);color:#fff;font-size:.9rem;line-height:1.35;pointer-events:none;opacity:0;transition:opacity .15s}
+#tip.on{opacity:1}
+.modal{position:fixed;inset:0;background:rgba(11,31,51,.35);display:none;place-items:center;z-index:150}
+.modal.on{display:grid}
+.mbox{width:min(46rem,92vw);background:#fff;border-radius:1.2rem;box-shadow:0 30px 80px rgba(11,31,51,.3);overflow:hidden}
+.mbox .mh{display:flex;align-items:center;gap:.8rem;padding:1rem 1.3rem;border-bottom:1px solid var(--line)}
+.mbox .mh b{font-size:1.1rem}
+.mbox .mh .x{margin-left:auto;border:0;background:none;font-size:1.3rem;color:var(--ink3)}
+.mbox .meta{padding:.8rem 1.3rem;font:500 .9rem/1.7 var(--fm);color:var(--ink2);border-bottom:1px solid var(--line)}
+.mbox .body{padding:1.1rem 1.3rem 1.4rem;font-size:1.05rem;line-height:1.55;white-space:pre-line}
+.mbox .body.ai{color:#2b1d75}
+.cheat .body{white-space:normal}
+.cheat table{border-collapse:collapse;width:100%;font-size:.95rem}
+.cheat td{padding:.3rem .4rem;border-bottom:1px solid #eef2f7}
+.cheat td:first-child{font:600 .85rem var(--fm);width:5rem}
+.cheat kbd{display:inline-block;min-width:1.6rem;text-align:center;padding:.1rem .4rem;border:1px solid var(--line);border-bottom-width:2px;border-radius:.35rem;background:var(--bg)}
+.cheat .cols{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem}
+.cheat h4{margin:0 0 .4rem;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3)}
+.typer{position:fixed;left:50%;bottom:11rem;transform:translateX(-50%);z-index:160;display:none;align-items:center;gap:.6rem;background:#fff;border:1px solid var(--line);border-radius:1rem;padding:.6rem .7rem .6rem 1rem;box-shadow:0 20px 60px rgba(11,31,51,.2)}
+.typer.on{display:flex}
+.typer input{width:34rem;border:0;outline:0;font:500 1.2rem var(--fb);color:var(--ink)}
+#bk{position:fixed;inset:0;background:#000;z-index:300;display:none;place-items:center;color:#fff}
+#bk.on{display:grid}
+#bk video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+#bk .ph{position:relative;text-align:center;font-family:var(--fd);font-size:2.4rem;opacity:.75;pointer-events:none}
+#bk .ph small{display:block;font:500 1rem var(--fb);margin-top:.6rem}
+.toast{position:fixed;left:50%;top:5.2rem;transform:translateX(-50%);z-index:170;background:var(--ink);color:#fff;padding:.5rem .9rem;border-radius:.6rem;font-size:.9rem;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.on{opacity:1}
+/* zone badges (G) */
+[data-zone]{position:relative}
+body.zones [data-zone]::before{content:attr(data-zone);position:absolute;left:.4rem;top:.4rem;z-index:60;font:700 .9rem var(--fm);background:var(--ai);color:#fff;border-radius:.4rem;padding:.2rem .45rem;box-shadow:0 0 0 2px #fff}
+body.zones [data-zone]{outline:2px dashed rgba(91,63,209,.45);outline-offset:-2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}}
+</style>
+</head>
+<body data-scene="calm" data-mood="idle" class="v2a">
+<header data-zone="2.I">
+  <div class="mark"><i></i>WATARI <small>for <b>KBC</b></small></div>
+  <nav class="steps" id="steps"></nav>
+  <div class="hr">
+    <span class="chip var" id="varChip" data-tip="Press V to cycle the sub-variants of option 2">Variant 2a · Runway chart</span>
+    <span class="chip" id="linkChip" data-tip="Where the call audio plays. Open phone.html on the iPhone to link it."><span class="dot"></span><span class="tx">Rehearsal · sound on laptop</span></span>
+    <button class="btn" id="armBtn" data-tip="Unlock browser audio on this laptop (U)"><i data-lucide="volume-2" class="ic"></i>Arm audio</button>
+    <button class="btn pri" id="startBtn" data-tip="Run the story (Space)"><i data-lucide="play" class="ic"></i>Start</button>
+    <button class="btn q" id="qBtn" data-tip="Keys and zones (?)">?</button>
+  </div>
+</header>
+<main>
+  <section class="left">
+    <div class="top">
+      <div class="box orbz" data-zone="2.A">
+        <div class="orbwrap" id="orbwrap" data-tip="Watari, Kodo's AI CFO. Colour = mood, the outer ring follows its voice."><canvas id="orb"></canvas><canvas id="ring"></canvas></div>
+        <div class="moodl"><span class="pip"></span><span id="moodTx">Quiet</span></div>
+        <div class="mic" id="mic"><i data-lucide="mic" class="ic"></i>Larry speaking<span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>
+        <div class="partners" id="partners" data-zone="2.B"></div>
+        <button class="logpill" id="logPill" data-zone="2.G" data-tip="Execution log: every read, rule and call Watari made (L)"><i data-lucide="terminal" class="ic"></i><span class="lt" id="logLast">log · idle</span><span class="n" id="logN">0</span></button>
+      </div>
+      <div class="box feed" data-zone="2.C">
+        <div class="kick" id="kick"><i data-lucide="calendar" class="ic"></i><span></span></div>
+        <div class="head" id="head"></div>
+        <div class="headsub" id="headsub"></div>
+        <div class="cards" id="cards"></div>
+        <div class="trans" id="trans"></div>
+      </div>
+    </div>
+    <div class="box chart" data-zone="2.D">
+      <div class="ch-h"><h2 id="chTitle">This week · cash</h2><span class="today mono" id="chToday"></span>
+        <div class="legend"><span><i class="lg-bal"></i>In account</span><span class="lgv off"><i class="lg-void"></i>Missing</span><span class="lgg off"><i class="lg-ghost"></i>Expected, not received</span><span class="lgk off"><i class="lg-kbc"></i>KBC bridge</span></div>
+      </div>
+      <div class="runway" id="runway">
+        <div class="yax" id="yax"></div>
+        <div class="plotw"><div class="plot" id="plot"></div><div class="xax" id="xax"></div></div>
+      </div>
+      <div class="gauge" id="gauge"></div>
+    </div>
+    <div class="box band" data-zone="2.F" id="band">
+      <div class="calm" id="calmTx"></div>
+      <div class="sub" id="sub">
+        <div class="spk watari" id="spk"><div class="badge"><i data-lucide="mic" class="ic"></i></div><div class="nm"><span id="spkNm">Watari</span><span class="ai-tag" id="spkAi">AI</span></div><div class="wave" id="wave"></div></div>
+        <div class="subtx watari" id="subtx"><p></p></div>
+        <div class="think" id="think"><div class="h"><span class="spin"></span>Watari thinking <span class="ai-tag">AI</span></div><div class="ln" id="thinkLn"></div></div>
+      </div>
+      <div class="ticker" id="ticker"></div>
+      <div class="astrip" id="astrip"></div>
+      <div class="outc" id="outc"></div>
+      <div class="cue" id="cue"></div>
+    </div>
+  </section>
+  <section class="phz" data-zone="2.H" id="phz">
+    <div class="phglow"></div>
+    <div id="ph"></div>
+    <div class="phcap"><i data-lucide="smartphone" class="ic"></i><span id="phcap">Mirror of Larry's iPhone · click works too</span></div>
+  </section>
+</main>
+
+<div class="drawer" id="drawer"><div class="dh">Execution log<button class="btn" id="logX" style="height:2rem">Close</button></div><ol id="logList"></ol></div>
+<div class="modal" id="mailM"><div class="mbox"><div class="mh"><span id="mailLogo"></span><b>Reminder to Colruyt Group</b><span class="ai-tag">AI written</span><button class="x" data-close>✕</button></div><div class="meta" id="mailMeta"></div><div class="body ai" id="mailBody"></div></div></div>
+<div class="modal cheat" id="cheatM"><div class="mbox"><div class="mh"><b>Operator keys · option 2 Cash cliff</b><button class="x" data-close>✕</button></div><div class="body"><div class="cols">
+  <div><h4>Keys</h4><table>
+  <tr><td><kbd>Space</kbd></td><td>Start · answer when ringing</td></tr>
+  <tr><td><kbd>A</kbd></td><td>Answer the call</td></tr>
+  <tr><td><kbd>N</kbd></td><td>Speak next scripted line (auto off)</td></tr>
+  <tr><td><kbd>Y</kbd></td><td>Approve the KBC notification</td></tr>
+  <tr><td><kbd>H</kbd></td><td>Hang up</td></tr>
+  <tr><td><kbd>R</kbd></td><td>Reset to calm</td></tr>
+  <tr><td><kbd>M</kbd></td><td>Auto user voice on/off</td></tr>
+  <tr><td><kbd>T</kbd></td><td>Type your own line</td></tr>
+  <tr><td><kbd>U</kbd></td><td>Arm audio</td></tr>
+  <tr><td><kbd>B</kbd></td><td>Backup video (Esc closes)</td></tr>
+  <tr><td><kbd>G</kbd></td><td>Zone labels</td></tr>
+  <tr><td><kbd>V</kbd></td><td>Cycle variant 2a · 2b · 2c</td></tr>
+  <tr><td><kbd>L</kbd></td><td>Execution log</td></tr>
+  </table></div>
+  <div><h4>Zones</h4><table>
+  <tr><td>2.A</td><td>Orb + voice ring + mic indicator</td></tr>
+  <tr><td>2.B</td><td>Partner logos (paths start here)</td></tr>
+  <tr><td>2.C</td><td>Feed: headline, signals, actions (2c: transcript)</td></tr>
+  <tr><td>2.D</td><td>Cash chart: runway (2a) or gauge (2b)</td></tr>
+  <tr><td>2.E</td><td>The void: €31.000 short, bridge fills it</td></tr>
+  <tr><td>2.F</td><td>Band: subtitles · thinking · outcome strip</td></tr>
+  <tr><td>2.G</td><td>Execution log pill</td></tr>
+  <tr><td>2.H</td><td>iPhone mirror</td></tr>
+  <tr><td>2.I</td><td>Header + scene stepper</td></tr>
+  </table><p style="margin:.8rem 0 0;font-size:.9rem;color:var(--ink2)">Variants: 2a Runway chart · 2b Big gauge · 2c Transcript panel, no subtitles</p></div>
+</div></div></div></div>
+<div class="typer" id="typer"><span class="ai-tag" style="background:#e6eef7;color:var(--navy)">LARRY</span><input id="typerIn" placeholder="Type what you say, Enter to send, Esc to cancel"><button class="btn pri" id="typerGo">Say</button></div>
+<div id="bk"><video id="backup" data-src="backup.mp4" playsinline controls></video><div class="ph" id="bkPh">Backup video<small>backup.mp4 · Esc to close</small></div></div>
+<div id="tip"></div>
+<div class="toast" id="toast"></div>
+
+<script src="core/lucide.min.js"></script>
+<script src="core/orb.js"></script>
+<script src="core/call.js"></script>
+<script src="core/phone.js"></script>
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const C=W.CFG, eur=W.eur, B=document.body;
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SPEED=W.SPEED||1;
+const st={scene:'calm',mood:'idle',calling:false,logs:[],ledger:{},actions:{},annSlot:0,variant:0,speak:null,userLv:0,watLv:0};
+
+/* ---------- static build ---------- */
+// stepper
+const STEPS=[['calm','Calm','coffee'],['signals','Signals','radio'],['cause','Cause','search'],['call','Call','phone'],['work','Work','zap'],['done','Done','check']];
+$('#steps').innerHTML=STEPS.map((s,i)=>(i?'<span class="sep"></span>':'')+`<span class="step" data-st="${s[0]}"><i data-lucide="${s[2]}" class="ic"></i>${s[1]}</span>`).join('');
+// partners
+const PIDS=['kbc','sdworx','attio','peppol','outlook','calendar'];
+$('#partners').innerHTML=PIDS.map(id=>`<span class="p" data-p="${id}" data-tip="<b>${W.PARTNERS[id].name}</b> · ${W.PARTNERS[id].role} · ${W.PARTNERS[id].proto}">${W.logo(id,40)}</span>`).join('');
+const P=id=>$(`[data-p="${id}"]`);
+// chart geometry
+const MAX=108000, MIN=-45000; const Y=v=>((MAX-v)/(MAX-MIN)*100);
+const DAYS=[['Tue 20','today'],['Wed 21',''],['Thu 22',''],['Fri 23','payday']];
+const COLW=21.5, X0=0; const dx=i=>X0+i*COLW; // columns 0..86, right gutter 14%
+const FRI_L=dx(3)+3, FRI_W=COLW-6;
+$('#chToday').textContent=C.today+' · '+C.company;
+$('#plot').innerHTML=`
+  ${DAYS.map((d,i)=>`<div class="daycol ${d[1]==='payday'?'payday':''}" style="left:${dx(i)}%;width:${COLW}%"></div>`).join('')}
+  <div class="gl" style="top:${Y(48200)}%"></div>
+  <div class="gl payl" style="top:${Y(C.payroll)}%"></div><div class="payl-lbl" style="top:${Y(C.payroll)}%">payroll due <span class="num">${eur(C.payroll)}</span></div>
+  <div class="gl zero" style="top:${Y(0)}%"></div>
+  <div class="empty">Waiting for signals · KBC · SD Worx · Attio · Peppol</div>
+  <div class="ghost" data-tip="${C.client.invoice} · Peppol: delivered ${C.client.sent}, not paid. If Colruyt had paid, the account would hold exactly the payroll." style="top:${Y(C.payroll)}%;height:${Y(C.balance)-Y(C.payroll)}%;width:${FRI_L-1}%">
+     <span style="--ws:2.2rem;display:contents">${W.logo('colruyt',34)}</span><span class="t">${C.client.name}</span><span class="num mono">${eur(C.client.amount)}</span><span class="exp">${C.client.daysLate} days late</span>
+     <span class="chase"><i data-lucide="mail" class="ic"></i><span class="todo">Chase from your mailbox</span><span class="done">Reminder sent</span></span></div>
+  <div class="bal" data-tip="KBC business account, read live via API" style="top:${Y(C.balance)}%;height:${Y(0)-Y(C.balance)}%;--bw:${FRI_L-1}%"><span class="lb">In your KBC account</span><span class="v">${eur(C.balance)}</span></div>
+  <div class="pbar" id="pbar" style="left:${FRI_L}%;width:${FRI_W}%;top:${Y(C.balance)}%;height:${Y(C.balance-C.payroll)-Y(C.balance)}%">
+     <div class="ptag" style="--ws:1.4rem">${W.logo('sdworx',22)}Payroll <span class="num">−${eur(C.payroll).slice(1)}</span></div>
+     <div class="top" style="height:${(C.balance)/(C.payroll)*100}%" data-tip="Covered by today's balance"></div>
+     <div class="void" id="void" data-zone="2.E" style="height:${(C.gap)/(C.payroll)*100}%" data-tip="The empty part: ${eur(C.gap)} the account cannot cover on ${C.payday}">
+        <div class="bridge" id="bridge"><span>KBC bridge<span class="num mono">${eur(C.credit.draw)}</span></span></div></div>
+  </div>
+  <div class="gaplbl" style="right:${100-FRI_L+1.5}%;top:${Y(-1500)}%"><div class="big">${eur(C.gap)} <em>short · Friday</em><span class="arr">→</span></div><div class="sub a">payroll for ${C.people} people would bounce</div>
+     <div class="ok"><div class="big" style="display:block;color:var(--ok)"><em>Friday covered</em> <span class="arr" style="color:var(--ok)">→</span></div><div class="sub">${C.people} people paid ${C.payday} · <span class="mono">${eur(C.payroll)}</span></div></div></div>
+  <div class="cost" data-tip="Credit line interest, ~${C.credit.days} days at ${C.credit.rate}" style="left:${FRI_L+FRI_W+1}%;top:${Y(-C.gap*.55)}%"><i data-lucide="tag" class="ic"></i>cost <span class="num">~${eur(C.credit.fee)}</span></div>
+  <div class="anns" id="anns"></div>`;
+$('#yax').innerHTML=[[C.payroll,'payl'],[C.balance,''],[0,'z'],[-C.gap,'']].map(([v,c])=>`<div class="yl ${c}" style="top:${Y(v)}%">${v<0?'−'+eur(-v):eur(v)}</div>`).join('');
+$('#xax').innerHTML=DAYS.map((d,i)=>`<div class="xl ${d[1]==='payday'?'pay':''}" style="left:${dx(i)+COLW/2}%">${d[1]==='payday'?'<b>'+d[0]+'</b> · payday':d[0]+(d[1]?' · today':'')}</div>`).join('');
+// gauge 2b
+$('#gauge').style.setProperty('--gb',(C.balance/C.payroll*100)+'%'); $('#gauge').innerHTML=`
+  <div class="g-top"><span class="l" style="--ws:1.7rem">${W.logo('sdworx',26)}Friday payroll · ${C.people} people</span><span class="num mono">${eur(C.payroll)}</span></div>
+  <div class="g-brk"></div>
+  <div class="g-track">
+    <div class="g-bal"><span style="font-size:1.05rem;opacity:.85">In your KBC account</span><span class="num mono">${eur(C.balance)}</span></div>
+    <div class="g-void" id="gvoid">
+      <div class="gh" style="--ws:2.2rem">${W.logo('colruyt',34)}<span style="font-weight:600">${C.client.short} owes</span><span class="num mono">${eur(C.client.amount)}</span><span class="ghost-exp" style="font:600 .8rem var(--fm);color:#c3000d;background:#fdecee;padding:.3rem .5rem;border-radius:.4rem">${C.client.daysLate} DAYS LATE</span></div>
+      <div class="gb2"><span class="lbl">KBC bridge</span><span class="num mono">${eur(C.credit.draw)}</span></div></div>
+  </div>
+  <div class="g-gap"><div class="big">${eur(C.gap)} <em>short · Friday</em></div><div class="okl"><em>Friday covered</em> · <span class="mono">${eur(C.payroll)}</span> funded</div></div>
+  <div class="g-bot"><span>€0</span><span class="cost2">Chase ${C.client.short} + bridge · cost ~<span class="mono">${eur(C.credit.fee)}</span></span><span class="mono">${eur(C.payroll)}</span></div>`;
+// wave bars
+$('#wave').innerHTML='<i></i>'.repeat(9);
+// calm band text
+const calmBand=()=>`<span style="--ws:2rem;display:contents">${W.logo('kbc',30)}</span><span><b>${C.company}</b> · ${C.companyTag}</span><span style="color:var(--ink3)">·</span><span>Watari checks cash every morning, before you do.</span>`;
+$('#calmTx').innerHTML=calmBand();
+
+/* ---------- orb + ring ---------- */
+const orb=K.Orb($('#orb'),{scale:.25,n:600});
+const ring=$('#ring'), rc=ring.getContext('2d'); let rlv=0, rph=0;
+function drawRing(){ const r=ring.getBoundingClientRect(), d=Math.min(2,devicePixelRatio||1);
+  if(ring.width!==Math.round(r.width*d)){ ring.width=Math.round(r.width*d); ring.height=Math.round(r.height*d); }
+  const w=ring.width,h=ring.height, cx=w/2, cy=h/2, R=Math.min(w,h)*.41; rc.clearRect(0,0,w,h);
+  rlv+= (st.watLv-rlv)*.35; st.watLv*=.9; rph+=.06; const N=84;
+  const speaking=rlv>.04; const col= st.mood==='alert'?'255,122,0': speaking?'0,174,239':'91,63,209';
+  for(let i=0;i<N;i++){ const a=i/N*Math.PI*2-Math.PI/2; const nz=.55+.45*Math.sin(i*1.7+rph*3)*Math.sin(i*.43-rph*2);
+    const L=(speaking? (3+rlv*Math.min(w,h)*.085*Math.abs(nz)) : 2.2*d);
+    rc.strokeStyle=`rgba(${col},${speaking?.85:.28})`; rc.lineWidth=(speaking?3:2)*d; rc.lineCap='round';
+    rc.beginPath(); rc.moveTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R); rc.lineTo(cx+Math.cos(a)*(R+L),cy+Math.sin(a)*(R+L)); rc.stroke(); }
+  // subtitle waveform bars + mic bars
+  const wb=$$('#wave i'); wb.forEach((b,i)=>{ const v= st.speak==='user'? st.userLv : rlv; b.style.height=Math.max(12,Math.min(100,(v*100)*(.45+.55*Math.abs(Math.sin(i*1.3+rph*4)))))+'%'; });
+  st.userLv*=.93; const mb=$$('#mic .bars i'); mb.forEach((b,i)=>b.style.height=Math.max(20,Math.min(100,st.userLv*100*(.5+.5*Math.abs(Math.sin(i*1.9+rph*5)))))+'%');
+  $('#mic').classList.toggle('on',st.userLv>.05 || st.speak==='userlive');
+  requestAnimationFrame(drawRing); }
+requestAnimationFrame(drawRing);
+
+/* ---------- phone mirror ---------- */
+const phEl=$('#ph'); W.Phone.mount(phEl,{mode:'mirror'});
+function fitPhone(){ const z=$('#phz'); const h=z.clientHeight-40, w=z.clientWidth; const sc=st.scene;
+  const big=['dialing','ringing','call'].includes(sc); const k= big?1:(sc==='work'||sc==='end')?.9:.8;
+  const s=Math.max(.3,Math.min(h*k/874, w*.96/415)); phEl.style.setProperty('--s',s.toFixed(3)); }
+new ResizeObserver(fitPhone).observe($('#phz')); addEventListener('resize',fitPhone);
+
+/* ---------- helpers ---------- */
+const flag=(f,on=true)=>B.classList.toggle('f-'+f,on);
+const link=(a,b,o={})=>{ if(!a||!b) return; K.link(a,b,{dur:RM?1:(o.dur||900)/Math.min(SPEED,2),...o}); };
+const icons=()=>K.icons();
+function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on'); clearTimeout(toast.t); toast.t=setTimeout(()=>e.classList.remove('on'),1600); }
+function setHead(kick,head,sub,tone){ $('#kick span').textContent=kick; const h=$('#head'); h.textContent=head; h.className='head'+(tone?' '+tone:''); $('#headsub').innerHTML=sub||''; }
+function stepper(name){ const map={calm:0,signals:1,cause:2,alert:2,dialing:3,ringing:3,call:3,work:4,end:5}; let idx=map[name]??0; if(name==='signals'&&B.classList.contains('f-cause')) idx=2;
+  $$('.step').forEach((s,i)=>{ s.classList.toggle('on',i===idx); s.classList.toggle('done',i<idx); s.classList.toggle('alert',i===idx&&(idx===2||idx===3)); s.classList.toggle('good',i===idx&&idx===5); }); }
+function card(id,{logo,title,sub,amt,amtCls,status,click,tip},where='#cards'){
+  let el=$(`${where} [data-c="${id}"]`); const fresh=!el;
+  if(!el){ el=document.createElement('div'); el.dataset.c=id; $(where).appendChild(el); }
+  el.className='card'+(status?' '+status:'')+(click?' click':''); if(tip) el.dataset.tip=tip;
+  el.innerHTML=`${logo?W.logo(logo,38):''}<div class="tx"><div class="t">${title}</div>${sub?`<div class="s">${sub}</div>`:''}</div>${amt!=null?`<span class="amt ${amtCls||''}">${amt}</span>`:''}${status?`<span class="st">${status==='running'?'<span class="spin" style="width:.8rem;height:.8rem"></span>working':status==='done'?'<i data-lucide="check" class="ic"></i>done':'preview'}</span>`:''}${click?'<span class="more" title="Open"><i data-lucide="maximize-2" class="ic"></i></span>':''}`;
+  if(click) el.onclick=click; icons(); return el; }
+
+/* ---------- headline per beat ---------- */
+function calmHead(){ setHead(C.today,'All quiet.',`Watari watches ${C.company}'s cash, payroll and invoices. Nothing needs you.`); }
+
+/* ---------- mail (AI written) ---------- */
+const MAIL=`Hi Colruyt accounts payable team,
+
+Friendly but firm reminder: invoice ${C.client.invoice} for ${eur(C.client.amount)} was sent on ${C.client.sent} via Peppol and is now ${C.client.daysLate} days overdue.
+
+Could you confirm the payment date by Thursday? The invoice is attached again for convenience. If anything blocks it on your side (PO, approver), just tell me and I will sort it out today.
+
+Thanks a lot,
+${C.founder}
+${C.company}`;
+function openMail(){ $('#mailLogo').style.setProperty('--ws','2rem'); $('#mailLogo').innerHTML=W.logo('outlook',30); $('#mailMeta').innerHTML=`From: ${C.founder.toLowerCase()}@kodo.be (your mailbox)<br>To: ${C.client.ap}<br>Subject: ${C.client.invoice} · ${eur(C.client.amount)} · ${C.client.daysLate} days overdue<br>Attached: ${C.client.invoice}.pdf`; $('#mailBody').textContent=MAIL; $('#mailM').classList.add('on'); }
+
+/* ---------- subtitles ---------- */
+let subTimer=null;
+function showSub(d){
+  const who=d.who; const box=$('#subtx'); const spk=$('#spk');
+  spk.className='spk '+who; $('#spkNm').textContent= who==='watari'?'Watari':C.founder; $('#spkAi').style.display= who==='watari'?'':'none';
+  box.className='subtx '+who;
+  let p=box.querySelector(`p[data-sid="${d.sid}"]`);
+  if(!p){ box.innerHTML=''; p=document.createElement('p'); p.dataset.sid=d.sid; box.appendChild(p); }
+  if(who==='user'){ st.speak= d.final?null:'userlive'; const ws=d.text.split(' '); p.innerHTML=ws.map((w,i)=>`<span class="${i===ws.length-1&&!d.final?'last':''}">${w}</span>`).join(' '); clearInterval(subTimer); }
+  else { st.speak='watari'; const ws=d.text.split(/\s+/); p.innerHTML=ws.map(w=>`<span class="w">${w}</span>`).join(' '); const spans=[...p.children]; let i=0; clearInterval(subTimer);
+    const rate= RM?1: 1000/(2.75*SPEED)*.92; if(RM){ spans.forEach(s=>s.classList.add('v')); } else { subTimer=setInterval(()=>{ if(i>=spans.length){ clearInterval(subTimer); return; } spans[i++].classList.add('v'); },rate); } }
+  // 2c transcript
+  const tr=$('#trans'); let tl=tr.querySelector(`[data-sid="${d.sid}"]`);
+  if(!tl){ tl=document.createElement('div'); tl.dataset.sid=d.sid; tr.appendChild(tl); while(tr.children.length>6) tr.firstElementChild.remove(); }
+  tl.className='tl '+who+(d.partial?' partial':''); tl.innerHTML=`<span class="who">${who==='watari'?'WATARI · AI':C.founder.toUpperCase()}</span><span class="tx">${d.text}</span>`;
+}
+function finishSub(){ clearInterval(subTimer); $$('#subtx .w').forEach(s=>s.classList.add('v')); }
+
+/* ---------- annotations on the chart ---------- */
+function annotate(text){
+  const t=text.toLowerCase(); let x;
+  if(/credit|draw|bridge/.test(t)) x=FRI_L+FRI_W/2-6; else if(/gap|payroll|fund|sd worx/.test(t)) x=FRI_L+FRI_W/2-4; else if(/cheapest|chase|approval|face id/.test(t)) x=dx(1)+COLW*.5; else x=dx(0)+COLW*.55;
+  const host=$('#anns'); host.querySelectorAll('.ann').forEach(a=>a.classList.add('old'));
+  // avoid collisions: drop older ones close in x
+  host.querySelectorAll('.ann').forEach(a=>{ if(Math.abs(parseFloat(a.style.left)-x)<24) a.remove(); });
+  const a=document.createElement('div'); a.className='ann'; a.style.left=x+'%'; a.style.top=Y(C.payroll+4000)+'%'; a.innerHTML=`<span class="ai-tag">AI</span>${text}`; host.appendChild(a);
+  while(host.children.length>3) host.firstElementChild.remove(); }
+
+/* ---------- band ticker (logs before the call, actions after) ---------- */
+function tick(kick,title,detail,logo,tone){ if(B.classList.contains('calling')||B.classList.contains('ended')) return; B.classList.add('ticking');
+  $('#ticker').className='ticker'+(tone?' '+tone:''); $('#ticker').style.setProperty('--ws','3.2rem'); $('#ticker').innerHTML=`${logo?W.logo(logo,48):'<span class="ai-tag" style="font-size:.9rem;padding:.5rem .6rem">LOG</span>'}<div class="tx"><div class="tk">${kick}</div><div class="tt">${title}</div>${detail?`<div class="td">${detail}</div>`:''}</div>`; }
+/* ---------- outcome strip ---------- */
+function outcome(){ const L=st.ledger; const covered=L.payroll==='covered';
+  $('#outc').innerHTML=[
+    ['user','Founder',covered?`Team paid ${C.payday} · ${C.founder} back to building`:`${C.client.short} chased · check Thursday`, L.timeSaved||'2h 10m','saved','g'],
+    ['landmark','KBC',covered?`Credit line drawn, auto-repaid when ${C.client.short} pays`:'No credit drawn', eur(L.kbcCredit||0), L.fee?`· fee ~${eur(L.fee)}`:'',''],
+    ['handshake','Partners',`SD Worx funded · ${C.client.short} reminded · Attio logged`, covered?eur(C.payroll):'—','payroll','g'],
+  ].map(([ic,k,l,n,u,g])=>`<div class="oc"><span class="ico"><i data-lucide="${ic}" class="ic"></i></span><div><div class="k">${k}</div><div><span class="num mono ${g}">${n}</span> <span class="l">${u}</span></div><div class="l">${l}</div></div></div>`).join(''); icons(); }
+
+/* ---------- events ---------- */
+const bus=W.bus;
+bus.on('reset',()=>{ B.classList.remove('ticking'); ['bal','pay','gap','cause','prop','bridge','covered','chase'].forEach(f=>flag(f,false)); B.classList.remove('calling','ended');
+  $('#cards').innerHTML=''; $('#trans').innerHTML=''; $('#astrip').innerHTML=''; $('#anns').innerHTML=''; $('#subtx').innerHTML='<p></p>'; $('#think').classList.remove('on'); $('#cue').textContent='';
+  $$('.lgv,.lgg,.lgk').forEach(e=>e.classList.add('off')); $$('.partners .p').forEach(p=>p.classList.remove('lit'));
+  st.logs=[]; st.ledger={}; st.actions={}; st.speak=null; $('#logList').innerHTML=''; $('#logLast').textContent='log · idle'; $('#logN').textContent='0'; calmHead(); });
+bus.on('scene',d=>{ st.scene=d.name; B.dataset.scene=d.name; stepper(d.name);
+  B.classList.toggle('big',['dialing','ringing','call'].includes(d.name)); B.classList.toggle('mid',['work','end'].includes(d.name));
+  setTimeout(fitPhone,30); setTimeout(fitPhone,950);
+  const s=d.name;
+  if(s==='calm') calmHead();
+  if(s==='signals') setHead('Signals · '+C.today,'What is due this week?','Reading the KBC account and the next SD Worx payroll run.');
+  if(s==='alert') setHead('Decision','Payroll at risk',`${eur(C.gap)} short on ${C.payday} · 3 days left · calling ${C.founder}`,'alert');
+  if(s==='dialing') setHead('Decision','Calling '+C.founder,'Mail is too slow, a push is too weak. Urgency overrides the focus block.','alert');
+  if(s==='ringing') setHead('Ringing','Calling '+C.founder,'Watari · your CFO · via KBC','alert');
+  if(s==='call'){ B.classList.add('calling'); setHead('On the call','Live with '+C.founder,B.classList.contains('v2c')?'Transcript live · Watari listens, thinks, proposes':'Subtitles below · Watari listens, thinks, proposes'); B.classList.remove('ticking'); }
+  if(s==='work'){ B.classList.remove('calling'); $('#anns').innerHTML=''; $('#cue').textContent=''; setHead('After the call','Watari is executing','Five partners, in parallel. No more input needed.'); }
+  if(s==='end'){ B.classList.add('ended'); const cov=st.ledger.payroll==='covered'; if(cov) flag('covered'); setHead('Done',cov?'Payroll covered.':'Client chased.',cov?`Your team gets paid ${C.payday}. Back to building.`:`Watari checks back Thursday.`,'good'); outcome(); $('#cue').textContent=''; }
+});
+bus.on('mood',d=>{ st.mood=d.mood; B.dataset.mood=d.mood; orb.setMood(d.mood); if(d.mood==='alert'||d.mood==='done') orb.pulse(.8); $('#moodTx').textContent=d.label||(K.moods[d.mood]||{}).label||d.mood; });
+bus.on('level',d=>{ if(d.who==='watari'){ orb.level(d.v); st.watLv=Math.max(st.watLv,d.v); } else { st.userLv=Math.max(st.userLv,d.v); } });
+bus.on('signal',s=>{ const p=P(s.src); if(p) p.classList.add('lit');
+  if(s.id==='bal'){ flag('bal'); orb.absorb(150,24); link(p,$('#orb'),{color:'#003665'}); setHead('Signals · '+C.today,'In the account',`KBC business account, live`); }
+  if(s.id==='pay'){ flag('pay'); orb.absorb(160,24); link(p,$('#orb'),{color:'#d0021b'}); setHead('Signals · '+C.today,'Due Friday',`SD Worx payroll for ${C.people} people`); }
+  if(s.id==='inv'){ $$('#cards .search').forEach(e=>e.remove()); }
+  card(s.id,{logo:s.src,title:s.title,sub:s.sub,amt:(s.amt<0?'−'+eur(-s.amt):eur(s.amt)),amtCls:s.tone,tip:s.tone==='late'?'Found in Attio, confirmed in Peppol':'Read live from '+W.PARTNERS[s.src].name}); });
+bus.on('gap',g=>{ flag('gap'); $('.lgv').classList.remove('off'); orb.pulse(.6); setHead('Signals · '+C.today,`${eur(g.gap)} short on Friday`,`Payroll <span class="mono">${eur(g.payroll)}</span> vs account <span class="mono">${eur(g.balance)}</span>`,'alert'); });
+bus.on('search',d=>{ const p=P(d.src); if(p) p.classList.add('lit'); link($('#orb'),p,{color:'#5B3FD1',bend:-.3}); stepper('cause');
+  $$('#cards .search').forEach(e=>e.remove()); const el=card('s-'+d.src,{logo:d.src,title:`Searching ${W.PARTNERS[d.src].name}`,sub:d.q}); el.classList.add('search'); el.insertAdjacentHTML('beforeend','<span class="spin"></span>');
+  setHead('Cause','Why is the account short?','Looking for money owed to '+C.company); });
+bus.on('cause',c=>{ flag('cause'); $('.lgg').classList.remove('off'); stepper('cause'); setHead('Cause',`${c.short} hasn't paid`,`<span class="mono">${c.invoice} · ${eur(c.amount)}</span> · ${c.daysLate} days late · every other client on time`,'alert'); });
+bus.on('dial',()=>{ link($('#orbwrap'),$('#ph'),{color:'#FF7A00',dur:1600,width:3,bend:-.18,keep:1400}); orb.emit(0,30); });
+bus.on('call',d=>{ if(d.status==='ended'){ st.speak=null; $('#think').classList.remove('on'); } });
+bus.on('say',d=>{ showSub(d); });
+bus.on('say-end',()=>{ finishSub(); st.speak=null; });
+bus.on('think',d=>{ const t=$('#think'); if(d.start){ $('#cue').textContent=''; t.classList.add('on'); $('#thinkLn').textContent='…'; return; }
+  if(d.step){ $('#thinkLn').textContent=d.step; if(!/^(heard|intent)/i.test(d.step)) annotate(d.step); } });
+bus.on('await',d=>{ $('#think').classList.remove('on'); $('#cue').textContent= d.hint? `cue · "${d.hint}"  (N)` : (d.accept.includes('approve')?'cue · approve on the iPhone (Y)':(d.accept.includes('answer')?'cue · answer (Space)':'')); });
+bus.on('proposal',()=>{ $('#cards').innerHTML=''; flag('prop'); $('.lgk').classList.remove('off'); setHead('On the call','The fix',`Chase ${C.client.short} + bridge with KBC · cost ~<span class="mono">${eur(C.credit.fee)}</span>`); link($('#orb'),P('kbc'),{color:'#00AEEF'}); });
+const ACTIP={mail:'Click to read the full mail',credit:'KBC credit line, '+eur(C.credit.limit)+' limit',payroll:'SD Worx payroll account',crm:'Attio note + follow-up task',cal:'Calendar block, cancels itself if paid',repay:'Repays the line from the Colruyt payment'};
+bus.on('action',a=>{ const prev=st.actions[a.id]||{}; st.actions[a.id]=a; const done=a.status==='done';
+  const opts={logo:a.app,title:a.title,sub:a.detail,status:a.status,tip:ACTIP[a.id],click:a.id==='mail'?openMail:null};
+  card('a-'+a.id,opts,'#cards'); card('a-'+a.id,opts,'#astrip');
+  if(st.scene==='work') tick(done?'Done':'Working', a.title, a.detail||'', a.app, done?'good':'');
+  if(a.id==='credit'&&(a.status==='running'||done)) flag('bridge');
+  if(a.id==='mail'&&done) flag('chase');
+  if(st.scene==='work'||st.scene==='end'){ if(prev.status!==a.status) link($('#orb'),P(a.app)||$('#ghost'),{color:done?'#12B76A':'#5B3FD1',bend:.2});
+    if(a.id==='payroll'&&done){ const v=B.classList.contains('v2b')?$('#gvoid'):$('#void'); if(!RM) K.fly(P('kbc'),v,{kind:'coin',n:12,spread:60,dur:1100/Math.min(SPEED,2)}); setTimeout(()=>flag('covered'),RM?0:1300/Math.min(SPEED,2)); }
+  } });
+bus.on('notif',n=>{ if(n.id==='approve'&&n.status==='shown') setHead('On the call','Approve on KBC Mobile','Face ID on the iPhone · founder approval for draws over €10.000'); });
+bus.on('ledger',d=>{ st.ledger[d.k]=d.v; if(st.scene==='end') outcome(); });
+bus.on('log',l=>{ st.logs.push(l); const li=document.createElement('li'); li.className=l.kind; li.innerHTML=`<span class="k">${l.kind}</span><span><span class="x">${l.text}</span>${l.detail?` <span class="d">· ${l.detail}</span>`:''}</span>`; $('#logList').appendChild(li);
+  $('#logLast').textContent=l.text+(l.detail?' · '+l.detail:'');
+  if(['signals','alert','dialing'].includes(st.scene) && l.kind!=='think') tick('Watari · '+l.kind, l.text, l.detail||'', null, (l.kind==='decide'||l.kind==='rule')&&st.scene!=='signals'?'alert':''); $('#logN').textContent=st.logs.length; const ol=$('#logList'); ol.scrollTop=ol.scrollHeight; });
+bus.on('peers',()=>{ const on=W.phoneLinked(); const c=$('#linkChip'); c.classList.toggle('linked',on); c.querySelector('.tx').textContent= on?'iPhone linked · sound on phone':'Rehearsal · sound on laptop'; });
+setInterval(()=>bus.emit('peers',{...W.peers},{localOnly:true}),2600);
+bus.on('auto',d=>toast('Auto user voice '+(d.on?'on':'off')));
+bus.on('armed',()=>{ const b=$('#armBtn'); b.classList.add('armed'); b.innerHTML='<i data-lucide="volume-2" class="ic"></i>Audio armed'; icons(); });
+bus.on('backup',()=>{ $('#bk').classList.add('on'); const v=$('#backup'); if(!v.getAttribute('src')) v.src=v.dataset.src; try{ const p=v.play(); p&&p.catch(()=>{}); }catch(e){} });
+$('#backup').addEventListener('playing',()=>$('#bkPh').style.display='none');
+$('#backup').addEventListener('error',()=>{},true);
+
+/* ---------- controls ---------- */
+$('#armBtn').onclick=()=>W.audio.arm();
+$('#startBtn').onclick=()=>W.engine.start();
+$('#qBtn').onclick=()=>$('#cheatM').classList.toggle('on');
+$('#logPill').onclick=()=>$('#drawer').classList.toggle('on'); $('#logX').onclick=()=>$('#drawer').classList.remove('on');
+$$('.modal').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m||e.target.closest('[data-close]')) m.classList.remove('on'); }));
+const VARS=[['v2a','Variant 2a · Runway chart'],['v2b','Variant 2b · Big gauge'],['v2c','Variant 2c · Transcript panel']];
+function setVar(i){ st.variant=i; VARS.forEach(v=>B.classList.remove(v[0])); B.classList.add(VARS[i][0]); $('#varChip').textContent=VARS[i][1]; }
+$('#varChip').onclick=()=>setVar((st.variant+1)%3);
+// typed line
+W.promptLine=()=>{ $('#typer').classList.add('on'); const i=$('#typerIn'); i.value=''; i.focus(); setTimeout(()=>i.focus(),20); };
+const sendLine=()=>{ const v=$('#typerIn').value.trim(); $('#typer').classList.remove('on'); if(!v) return; if(W.engine.pend) W.engine.say(v); else toast('Watari is not waiting for you yet'); };
+$('#typerGo').onclick=sendLine;
+$('#typerIn').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); sendLine(); } if(e.key==='Escape') $('#typer').classList.remove('on'); e.stopPropagation(); });
+addEventListener('keydown',e=>{ if(/input|textarea/i.test(e.target.tagName)) return; const k=e.key.toLowerCase();
+  if(k==='escape'){ $('#bk').classList.remove('on'); try{ $('#backup').pause(); }catch(_){} $$('.modal').forEach(m=>m.classList.remove('on')); $('#drawer').classList.remove('on'); $('#typer').classList.remove('on'); }
+  if(k==='g') B.classList.toggle('zones');
+  if(k==='v') setVar((st.variant+1)%3);
+  if(k==='l') $('#drawer').classList.toggle('on');
+  if(e.key==='?') $('#cheatM').classList.toggle('on');
+  if(k===' '||k==='t') e.preventDefault();
+});
+// tooltips
+const tip=$('#tip');
+document.addEventListener('mouseover',e=>{ const t=e.target.closest('[data-tip]'); if(!t){ tip.classList.remove('on'); return; } tip.innerHTML=t.dataset.tip; tip.classList.add('on'); });
+document.addEventListener('mousemove',e=>{ if(!tip.classList.contains('on')) return; const r=tip.getBoundingClientRect(); let x=e.clientX+14, y=e.clientY+16; if(x+r.width>innerWidth-8) x=e.clientX-r.width-14; if(y+r.height>innerHeight-8) y=e.clientY-r.height-12; tip.style.left=x+'px'; tip.style.top=y+'px'; });
+
+calmHead(); stepper('calm'); icons(); fitPhone();
+})();
+</script>
+<script src="core/toolbar.js"></script>
+</body>
+</html>

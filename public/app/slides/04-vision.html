@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Watari · Vision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#fff;--mute:rgba(255,255,255,.64);--faint:rgba(255,255,255,.38);--line:rgba(255,255,255,.13);--cyan:#00aeef;--cy2:#7fd8ff;--ease:cubic-bezier(.2,.8,.2,1)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0b0b0d;overflow:hidden}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink)}
+#slide{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center;overflow:hidden;
+  background:radial-gradient(1100px 760px at 50% 56%,#26282d 0%,#18191c 45%,#111113 100%)}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.brand{position:absolute;left:72px;top:58px;display:flex;align-items:center;gap:14px;font-weight:700;letter-spacing:.22em;font-size:17px}
+.brand i{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle,#fff 0 14%,#7fd8ff 38%,#1e8bff 72%,#1f5fe0 100%);box-shadow:0 0 18px rgba(0,174,239,.55)}
+.tag{position:absolute;right:72px;top:56px;height:38px;padding:0 18px;border-radius:999px;border:1px solid var(--line);display:flex;align-items:center;font-size:15px;color:var(--mute);font-weight:500}
+h1{position:absolute;left:0;right:0;top:122px;margin:0 auto;max-width:1460px;text-align:center;font-size:56px;font-weight:600;letter-spacing:-.032em;line-height:1.12}
+h1 em{font-style:normal;color:var(--cy2)}
+.pg{position:absolute;right:72px;bottom:44px;font-size:13px;color:var(--faint);letter-spacing:.08em}
+.fx{opacity:0;transform:translateY(10px);animation:in .9s var(--ease) forwards}
+@keyframes in{to{opacity:1;transform:none}}
+canvas.orb{position:absolute}
+#wires{position:absolute;inset:0;width:1920px;height:1080px;pointer-events:none}
+#wires path{fill:none;stroke:rgba(140,215,255,.26);stroke-width:1.4;stroke-dasharray:3 9;animation:dash 1.6s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-24}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;opacity:1!important;transform:none}}
+
+.side{position:absolute;top:288px;display:flex;align-items:center;gap:12px;font-size:15px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.side span{height:30px;padding:0 13px;border-radius:999px;border:1px solid var(--line);display:flex;align-items:center;letter-spacing:.06em;font-size:13px;color:var(--mute)}
+.grp{position:absolute;width:560px;padding:20px 24px 22px;border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));border:1px solid var(--line)}
+.grp h4{display:flex;align-items:center;gap:12px;font-size:23px;font-weight:600;letter-spacing:-.01em}
+.grp h4 b{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(0,174,239,.15);color:var(--cy2);flex:none}
+.grp ul{list-style:none;margin-top:12px;display:grid;gap:7px}
+.grp li{font-size:18.5px;color:var(--mute);line-height:1.35;padding-left:20px;position:relative}
+.grp li::before{content:"";position:absolute;left:2px;top:10px;width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.L{left:96px}.R{right:96px}
+.now{position:absolute;left:0;right:0;top:812px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.now .live{display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 18px;border-radius:999px;background:#fff;color:#111;font-size:16px;font-weight:600}
+.now .live i{width:8px;height:8px;border-radius:50%;background:#00aeef;box-shadow:0 0 0 4px rgba(0,174,239,.22)}
+.now small{font-size:19px;color:var(--mute)}
+
+</style></head>
+<body><div id="slide">
+<div class="brand"><i></i>WATARI</div>
+
+<h1 class="fx" style="animation-delay:.05s">Watari grows from one CFO agent into <em>an army of agents</em> covering the full life cycle of businesses and people.</h1>
+<div class="side fx" style="left:96px;animation-delay:.25s">Businesses<span>B2B</span></div>
+<div class="side fx" style="right:96px;animation-delay:.25s"><span>B2C</span>People</div>
+<svg id="wires" viewBox="0 0 1920 1080"><defs><filter id="glow" x="-2" y="-2" width="5" height="5"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="M800,560 C720,460 700,420 656,418"/><circle r="4" fill="#bfeaff" filter="url(#glow)"><animateMotion dur="3.2s" begin="0.00s" repeatCount="indefinite" path="M800,560 C720,460 700,420 656,418"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="3.2s" begin="0.00s" repeatCount="indefinite"/></circle><circle r="4" fill="#bfeaff" filter="url(#glow)"><animateMotion dur="3.2s" begin="-1.60s" repeatCount="indefinite" path="M800,560 C720,460 700,420 656,418"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="3.2s" begin="-1.60s" repeatCount="indefinite"/></circle><path d="M790,615 L656,634"/><circle r="4" fill="#bfeaff" filter="url(#glow)"><animateMotion dur="3.2s" begin="-0.37s" repeatCount="indefinite" path="M790,615 L656,634"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="3.2s" begin="-0.37s" repeatCount="indefinite"/></circle><circle r="4" fill="#bfeaff" filter="url(#glow)"><animateMotion dur="3.2s" begin="-1.97s" repeatCount="indefinite" path="M790,615 L656,634"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="3.2s" begin="-1.97s" repeatCount="indefinite"/></circle><path d="M800,660 C720,760 700,850 656,850"/><circle r="4" fill="#bfeaff" filter="url(#glow)"><animateMotion dur="3.2s" begin="-0.74s" repeatCount="indefinite" path="M800,660 C720,760 700,850 656,850"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="3.2s" begin="-0.74s" repeatCount="indefinite"/></circle><circle r="4" fill="#bfeaff" filter="url(#glow)"><animateMotion dur="3.2s" begin="-2.34s" repeatCount="indefinite" path="M800,660 C720,760 700,850 656,850"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="3.2s" begin="-2.34s" repeatCount="indefinite"/></circle><path d="M1120,560 C1200,460 1220,420 1264,418"/><circle r="4" fill="#bfeaff" filter="url(#glow)"><animateMotion dur="3.2s" begin="-1.11s" repeatCount="indefinite" path="M1120,560 C1200,460 1220,420 1264,418"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="3.2s" begin="-1.11s" repeatCount="indefinite"/></circle><circle r="4" fill="#bfeaff" filter="url(#glow)"><animateMotion dur="3.2s" begin="-2.71s" repeatCount="indefinite" path="M1120,560 C1200,460 1220,420 1264,418"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="3.2s" begin="-2.71s" repeatCount="indefinite"/></circle><path d="M1130,615 L1264,634"/><circle r="4" fill="#bfeaff" filter="url(#glow)"><animateMotion dur="3.2s" begin="-1.48s" repeatCount="indefinite" path="M1130,615 L1264,634"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="3.2s" begin="-1.48s" repeatCount="indefinite"/></circle><circle r="4" fill="#bfeaff" filter="url(#glow)"><animateMotion dur="3.2s" begin="-3.08s" repeatCount="indefinite" path="M1130,615 L1264,634"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="3.2s" begin="-3.08s" repeatCount="indefinite"/></circle><path d="M1120,660 C1200,760 1220,850 1264,850"/><circle r="4" fill="#bfeaff" filter="url(#glow)"><animateMotion dur="3.2s" begin="-1.85s" repeatCount="indefinite" path="M1120,660 C1200,760 1220,850 1264,850"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="3.2s" begin="-1.85s" repeatCount="indefinite"/></circle><circle r="4" fill="#bfeaff" filter="url(#glow)"><animateMotion dur="3.2s" begin="-3.45s" repeatCount="indefinite" path="M1120,660 C1200,760 1220,850 1264,850"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="3.2s" begin="-3.45s" repeatCount="indefinite"/></circle></svg>
+<canvas class="orb" data-size="440" data-r="92" style="left:740px;top:390px"></canvas>
+<div class="grp L fx" style="top:336px;animation-delay:0.4s"><h4><b><svg class="i" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1" /> <circle cx="19" cy="21" r="1" /> <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" /></svg></b>Procurement</h4><ul><li>Finds the best supplier and negotiates the renewal</li><li>Cancels duplicate software that nobody uses</li></ul></div>
+<div class="grp L fx" style="top:552px;animation-delay:0.5s"><h4><b><svg class="i" viewBox="0 0 24 24"><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17" /> <path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9" /> <path d="m2 16 6 6" /> <circle cx="16" cy="9" r="2.9" /> <circle cx="6" cy="5" r="3" /></svg></b>Getting paid and paying</h4><ul><li>Chases late invoices politely, in your tone of voice</li><li>Pays each bill on the day that is best for cash</li></ul></div>
+<div class="grp L fx" style="top:768px;animation-delay:0.6s"><h4><b><svg class="i" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /> <path d="M14 2v4a2 2 0 0 0 2 2h4" /> <path d="m9 15 2 2 4-4" /></svg></b>Tax and compliance</h4><ul><li>Prepares the VAT return straight from the books</li><li>Finds grants and subsidies you qualify for, and applies</li></ul></div>
+<div class="grp R fx" style="top:336px;animation-delay:0.45s"><h4><b><svg class="i" viewBox="0 0 24 24"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2V5z" /> <path d="M2 9v1c0 1.1.9 2 2 2h1" /> <path d="M16 11h.01" /></svg></b>Savings</h4><ul><li>Moves spare cash to savings the day after payday</li><li>Saves for a holiday or a house on autopilot</li></ul></div>
+<div class="grp R fx" style="top:552px;animation-delay:0.55s"><h4><b><svg class="i" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /> <path d="m9 12 2 2 4-4" /></svg></b>Safe spending</h4><ul><li>Stops a suspicious payment before the money leaves</li><li>Warns before a free trial charges or a price goes up</li></ul></div>
+<div class="grp R fx" style="top:768px;animation-delay:0.65s"><h4><b><svg class="i" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /> <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg></b>Household admin</h4><ul><li>Switches energy or insurance to a better deal</li><li>Claims refunds for delayed trains and flights for you</li></ul></div>
+<div class="now fx" style="animation-delay:.3s"><span class="live"><i></i>Launching soon · Agent CFO with KBC</span><small>Long term: one agent leading an army of agents, from first day to every later stage</small></div>
+<div class="pg">04</div>
+
+</div>
+<script>
+const S=document.getElementById('slide');
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);S.style.transform=`translate(-50%,-50%) scale(${s})`;}
+addEventListener('resize',fit);fit();
+/* WATARI orb: blue and white bubbles, rotating sphere, orbit rings with travelling lights */
+function makeOrb(cv,size,R0){const c=cv.getContext('2d'),W=size,H=size,D=2;cv.width=W*D;cv.height=H*D;cv.style.width=W+'px';cv.style.height=H+'px';
+ const N=760,P=[];for(let i=0;i<N;i++){const y=1-(i+.5)/N*2,r=Math.sqrt(1-y*y),th=i*2.399963;P.push([Math.cos(th)*r,y,Math.sin(th)*r,.5+((i*7919)%100)/100*.9,(i*104729)%9===0]);}
+ const RINGS=[{rx:1.42,ry:.34,tilt:-.32,sp:.00042,n:3},{rx:1.62,ry:.42,tilt:.22,sp:-.0003,n:2}];let rot=0;const t0=performance.now();
+ function ball(x,y,r,h,l,a,w){const g=c.createRadialGradient(x-r*.35,y-r*.35,r*.08,x,y,r);g.addColorStop(0,`hsla(${h},100%,${Math.min(98,l+28)}%,${a})`);g.addColorStop(1,`hsla(${h},${w?50:95}%,${l}%,${a})`);c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,7);c.fill();}
+ function rings(X,Y,R,t,front){for(const rg of RINGS){c.save();c.translate(X,Y);c.rotate(rg.tilt);c.strokeStyle='rgba(160,220,255,.22)';c.lineWidth=1;c.setLineDash([2,7]);c.beginPath();
+  c.ellipse(0,0,R*rg.rx,R*rg.ry,0,front?0:Math.PI,front?Math.PI:Math.PI*2);c.stroke();c.setLineDash([]);
+  for(let k=0;k<rg.n;k++){const a=(t*rg.sp*1000+k*2*Math.PI/rg.n)%(2*Math.PI),py=Math.sin(a);if((py>0)!==front)continue;const x=Math.cos(a)*R*rg.rx,y=py*R*rg.ry;
+   const gg=c.createRadialGradient(x,y,0,x,y,9);gg.addColorStop(0,'rgba(255,255,255,1)');gg.addColorStop(.35,'rgba(120,215,255,.9)');gg.addColorStop(1,'rgba(0,174,239,0)');c.fillStyle=gg;c.beginPath();c.arc(x,y,9,0,7);c.fill();}
+  c.restore();}}
+ (function draw(now){const t=(now-t0)/1000;c.setTransform(D,0,0,D,0,0);c.clearRect(0,0,W,H);const X=W/2,Y=H/2,R=R0*(1+Math.sin(t*1.1)*.015);rot+=.0042;
+  let g=c.createRadialGradient(X,Y,0,X,Y,R*2.1);g.addColorStop(0,'rgba(120,215,255,.55)');g.addColorStop(.35,'rgba(0,150,255,.18)');g.addColorStop(1,'rgba(0,120,255,0)');c.fillStyle=g;c.beginPath();c.arc(X,Y,R*2.1,0,7);c.fill();
+  rings(X,Y,R,t,false);const cr=Math.cos(rot),sr=Math.sin(rot),ct=Math.cos(.38),st=Math.sin(.38);
+  const Q=P.map(([x,y,z,s,w])=>{const x1=x*cr-z*sr,z1=x*sr+z*cr;return[x1,y*ct-z1*st,y*st+z1*ct,s,w];}).sort((a,b)=>a[2]-b[2]);
+  c.globalCompositeOperation='lighter';for(const[x,y,z,s,w]of Q){const d=(z+1)/2,e=Math.hypot(x,y),r=(1.2+d*2.9)*s*(R/130);ball(X+x*R,Y+y*R,r,w?196:208+e*16,w?92:58-e*14+d*8,.22+d*.7,w);}
+  c.globalCompositeOperation='source-over';g=c.createRadialGradient(X,Y,0,X,Y,R*.55);g.addColorStop(0,'rgba(255,255,255,.95)');g.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=g;c.beginPath();c.arc(X,Y,R*.55,0,7);c.fill();
+  rings(X,Y,R,t,true);requestAnimationFrame(draw);})(t0);}
+document.querySelectorAll('canvas.orb').forEach(cv=>makeOrb(cv,+cv.dataset.size,+cv.dataset.r));
+</script><script src="/app/bridge.js"></script></body></html>

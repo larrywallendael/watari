@@ -1,0 +1,139 @@
+<title>WATARI Call Demo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a review board. Hero = how to run it, then 4 option cards side by side, then stage checklist + sync design. */
+:root{--bg:#f4f7fb;--card:#ffffff;--ink:#0b1f33;--muted:#5a6b7d;--line:#dce3ec;--navy:#003665;--cyan:#00aeef;--ai:#5b3fd1;--warn:#c25e00;--ok:#12805a;--soft:#e6f4fb;
+ --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;--body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1724;--card:#142234;--ink:#e6eef7;--muted:#9fb2c7;--line:#26384f;--navy:#8cc8ff;--cyan:#38bdf8;--ai:#a99bff;--warn:#ffb067;--ok:#5fd3a2;--soft:#123049;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1724;--card:#142234;--ink:#e6eef7;--muted:#9fb2c7;--line:#26384f;--navy:#8cc8ff;--cyan:#38bdf8;--ai:#a99bff;--warn:#ffb067;--ok:#5fd3a2;--soft:#123049;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:1240px;margin:0 auto;display:grid;gap:22px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
+h1{font-size:clamp(28px,4.4vw,44px);font-weight:800;color:var(--navy)}
+h2{font-size:22px}h3{font-size:19px}
+.eyebrow{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:12px;min-width:0}
+.run{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.run .box{gap:8px}
+.step{display:flex;gap:10px;align-items:baseline}
+.step b{font:600 13px var(--mono);color:var(--cyan)}
+.btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:999px;background:var(--navy);color:var(--card);font-weight:600;text-decoration:none;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--navy);border:1px solid var(--line)}
+.btn:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}
+.opt{display:grid;gap:10px;align-content:start}
+.num{font:800 40px var(--display);color:var(--cyan);line-height:1}
+.gloss{color:var(--muted);font-size:14px}
+.tag{display:inline-block;font:500 11px var(--mono);padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--navy);margin:0 4px 4px 0}
+details{border-top:1px solid var(--line);padding-top:8px}
+summary{cursor:pointer;font-weight:600;font-size:14px}
+ul{margin:6px 0 0;padding-left:18px;display:grid;gap:3px;font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px 14px;font-size:14px}
+kbd{font:500 12px var(--mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;background:var(--bg)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+.flow{display:grid;gap:6px;font-size:14px}
+.flow div{display:grid;grid-template-columns:110px 1fr;gap:10px}
+.flow span:first-child{font:500 12px var(--mono);color:var(--muted)}
+.warn{color:var(--warn)}
+.mono{font-family:var(--mono)}
+</style>
+
+<div class="wrap">
+  <section class="box">
+    <div class="eyebrow">KBC final · CFO on Call · 4 options · built 20 Oct</div>
+    <h1>WATARI call demo</h1>
+    <p class="gloss" style="max-width:70ch;margin:0">Same engine, same phone, same orb in all four. Only the big screen differs. Press <kbd>G</kbd> on any option to show numbered zones (1.A, 2.C…) and <kbd>V</kbd> for its sub-variants, then tell me which parts you want to keep.</p>
+    <div class="run">
+      <div class="box"><h3>Rehearse on the laptop</h3>
+        <div class="step"><b>1</b><span>Open an option below. Press <kbd>U</kbd> (arm audio), then <kbd>Space</kbd>.</span></div>
+        <div class="step"><b>2</b><span>The mirror phone rings. Click Accept or press <kbd>Space</kbd>. Your lines and the approval are simulated.</span></div>
+        <div class="step"><b>3</b><span>Optional: open the phone page in a second window; both stay in sync and sound moves to the phone window.</span></div>
+      </div>
+      <div class="box"><h3>Try the phone on your iPhone</h3>
+        <div class="step"><b>1</b><span>Open this page on the iPhone, tap "Phone page".</span></div>
+        <div class="step"><b>2</b><span>Tap to arm audio, then double-tap the lock screen: it rings, Watari talks, the KBC approval pops up.</span></div>
+        <div class="step"><b>3</b><span class="warn">Phone and laptop only sync inside one browser today. Cross-device sync is the first build task (relay, see below).</span></div>
+      </div>
+    </div>
+    <div class="row"><a class="btn" href="phone.html">Phone page</a><a class="btn ghost" href="CONTRACT.md">Event contract</a></div>
+  </section>
+
+  <section class="opts">
+    <article class="box opt">
+      <div class="num">1</div><h2>Mirror</h2>
+      <div class="gloss">Your brief, evolved v7: cash tank left, orb with partner ring, phone takes the right column.</div>
+      <div><span class="tag">1a ring</span><span class="tag">1b row</span><span class="tag">1c calm theatre</span></div>
+      <a class="btn" href="opt-1-mirror.html">Open option 1</a>
+      <details><summary>Zones</summary><ul><li>1.A header + stepper</li><li>1.B cash this week</li><li>1.C cash tank, €31.000 void</li><li>1.D orb + voice ring</li><li>1.E partner logos</li><li>1.F mood chip + "Larry speaking"</li><li>1.G cause card</li><li>1.H live transcript + thinking</li><li>1.I iPhone mirror</li><li>1.J plan / action cards</li><li>1.K value ledger</li><li>1.L execution log</li></ul></details>
+    </article>
+    <article class="box opt">
+      <div class="num">2</div><h2>Cash cliff</h2>
+      <div class="gloss">Money is the hero: Tue to Fri runway, the payroll cliff, the void that KBC fills. Cinema subtitles.</div>
+      <div><span class="tag">2a runway</span><span class="tag">2b big gauge</span><span class="tag">2c transcript panel</span></div>
+      <a class="btn" href="opt-2-cash-cliff.html">Open option 2</a>
+      <details><summary>Zones</summary><ul><li>2.A orb + voice bars</li><li>2.B partner logos</li><li>2.C feed: headline, signals, actions</li><li>2.D cash chart</li><li>2.E the void + KBC bridge</li><li>2.F band: ticker, subtitles, outcome</li><li>2.G log pill</li><li>2.H iPhone mirror</li><li>2.I header</li></ul></details>
+    </article>
+    <article class="box opt">
+      <div class="num">3</div><h2>Cinema</h2>
+      <div class="gloss">Empty stage. App windows fly out of the orb, zoom big, do the work, dock. Closing line: "While you kept building…"</div>
+      <div><span class="tag">3a windows zoom</span><span class="tag">3b split screen</span><span class="tag">3c phone centre</span></div>
+      <a class="btn" href="opt-3-cinema.html">Open option 3</a>
+      <details><summary>Zones</summary><ul><li>3.A header</li><li>3.B orb + partner ring</li><li>3.C iPhone mirror</li><li>3.D spotlight windows</li><li>3.E dock shelf</li><li>3.F proposal previews</li><li>3.G think chips</li><li>3.H live subtitles</li><li>3.I alert headline</li><li>3.J closing line</li><li>3.K log</li><li>3.L approval callout</li></ul></details>
+    </article>
+    <article class="box opt">
+      <div class="num">4</div><h2>Ops room</h2>
+      <div class="gloss">For tech judges: 4 sub-agents, partners with protocols, consent on your terms, live reasoning, triple-win ledger.</div>
+      <div><span class="tag">4a agents</span><span class="tag">4b log-first</span><span class="tag">4c consent</span></div>
+      <a class="btn" href="opt-4-ops-room.html">Open option 4</a>
+      <details><summary>Zones</summary><ul><li>4.A header</li><li>4.B cash this week</li><li>4.C cause</li><li>4.D consent scopes</li><li>4.E orb + agents</li><li>4.F partner ring</li><li>4.G live transcript</li><li>4.H reasoning</li><li>4.I plan → execution</li><li>4.J iPhone mirror</li><li>4.K execution log</li><li>4.L triple-win ledger</li></ul></details>
+    </article>
+  </section>
+
+  <section class="box">
+    <h2>Keys on the big screen</h2>
+    <div class="keys">
+      <span><kbd>Space</kbd> start / answer</span><span><kbd>U</kbd> arm audio</span><span><kbd>N</kbd> next scripted line</span><span><kbd>T</kbd> type your own line</span>
+      <span><kbd>Y</kbd> approve</span><span><kbd>H</kbd> hang up</span><span><kbd>M</kbd> auto voice on/off</span><span><kbd>R</kbd> reset</span>
+      <span><kbd>B</kbd> backup video</span><span><kbd>G</kbd> zone labels</span><span><kbd>V</kbd> sub-variant</span><span><kbd>L</kbd> execution log</span>
+    </div>
+    <p class="gloss" style="margin:0">Try <kbd>M</kbd> (auto off) then <kbd>T</kbd> "How much does it cost?" or "Which client?": Watari answers and goes back to the plan. That is the flexibility you need when you deviate.</p>
+  </section>
+
+  <section class="two">
+    <div class="box">
+      <h2>How sync works on stage</h2>
+      <div class="flow">
+        <div><span>Clock owner</span><span>The laptop runs the story. The iPhone only renders and sends taps.</span></div>
+        <div><span>Sound</span><span>Ringtone + Watari voice + your mic all on the iPhone. Laptop silent until you hang up, then app sounds.</span></div>
+        <div><span>Your voice</span><span>iPhone mic → Soniox streaming STT → words stream to both screens. Watari waits for end of your sentence.</span></div>
+        <div><span>Watari voice</span><span>Claude picks the next line from the plan (scripted lines first, free answers when you deviate) → ElevenLabs TTS streamed on the iPhone. Phone sends the voice level so the big orb moves with it.</span></div>
+        <div><span>Link</span><span>One WebSocket room (e.g. Ably / Pusher / PartyKit; Vercel functions can't hold sockets). Target &lt;150 ms.</span></div>
+        <div><span>Fallback</span><span><kbd>N</kbd> plays your scripted line, <kbd>Y</kbd> approves, <kbd>B</kbd> backup video. Same visuals.</span></div>
+      </div>
+    </div>
+    <div class="box">
+      <h2>Before you go up</h2>
+      <ul>
+        <li>iPhone: Do Not Disturb on, Auto-Lock Never, brightness max, silent switch off</li>
+        <li>Open the phone page full screen (Add to Home Screen = no Safari bars)</li>
+        <li>Tap "arm audio" on both screens</li>
+        <li>Own hotspot, never the venue Wi-Fi</li>
+        <li>Mic close to the phone speaker</li>
+        <li>Backup video in a second tab, key <kbd>B</kbd></li>
+      </ul>
+      <p class="gloss warn" style="margin:0">iOS Safari can't vibrate from a web page. If the buzz matters, the build can place a real call (ElevenLabs + Twilio): native ring and vibration, but then the call screen is Apple's, not ours.</p>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>Before you pick</h2>
+    <ul>
+      <li><b>Real names:</b> Colruyt is in as you asked, but only as a text mark. Showing a real Belgian company as a late payer, in front of KBC, can backfire. One line in <span class="mono">W.CFG.client</span> switches it to a fictional client.</li>
+      <li><b>Logos:</b> partners are text marks. Drop official SVGs in <span class="mono">core/logos/</span> and open with <span class="mono">?logos=1</span>.</li>
+      <li><b>Voice in this prototype</b> is the browser voice. ElevenLabs replaces it in the build.</li>
+    </ul>
+  </section>
+</div>

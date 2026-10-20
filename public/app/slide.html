@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<base href="/app/">
+<title>WATARI · Slide</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cdefs%3E%3CradialGradient id=%22g%22%3E%3Cstop offset=%22.14%22 stop-color=%22%23fff%22/%3E%3Cstop offset=%22.34%22 stop-color=%22%237fd8ff%22/%3E%3Cstop offset=%22.7%22 stop-color=%22%231e8bff%22/%3E%3Cstop offset=%221%22 stop-color=%22%231f5fe0%22/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2215%22 fill=%22url(%23g)%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0b3b7a;--navy-d:#062a5b;--cyan:#00aeef;--cyan-soft:#e3f6fd;--cyan-line:#bfe9fa;
+  --ink:#0b1f33;--ink-2:#34435a;--muted:#5a6b7d;--faint:#8a97a8;--line:#e3e9f1;--line-2:#d3dce8;--bg:#f4f7fb;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;--ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:#e6ecf4;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+#app{position:absolute;left:50%;top:50%;width:1600px;height:940px;transform-origin:center;background:#fff;overflow:hidden;transform:translate(-50%,-50%)}
+.hdr{position:absolute;left:28px;top:22px;display:flex;align-items:center;gap:10px;z-index:2}
+.mk{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 50% 50%,#fff 0 14%,#7fd8ff 34%,#1e8bff 70%,#1f5fe0 100%);box-shadow:0 0 0 3px #fff,0 0 0 4px var(--line),0 4px 14px rgba(0,174,239,.35)}
+.hdr b{display:block;font-weight:800;letter-spacing:.16em;font-size:13.5px;color:var(--navy-d)}
+.hdr small{display:block;font-size:10px;color:var(--muted);font-weight:500}
+.lbl{position:absolute;right:30px;top:30px;font:600 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint);z-index:2}
+.frame{position:absolute;left:120px;top:110px;right:120px;bottom:90px;border:1.5px dashed var(--line-2);border-radius:24px;display:grid;place-items:center;
+  background:radial-gradient(520px 320px at 50% 50%,rgba(0,174,239,.05),transparent 70%),radial-gradient(#eef2f7 1px,transparent 1.2px) 0 0/18px 18px}
+.frame div{text-align:center;display:grid;gap:12px;justify-items:center}
+.frame .ghost{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle,#fff 0 12%,#bfeaff 40%,#cfe0ff 75%,transparent 76%);opacity:.8}
+.frame p{font-size:15px;font-weight:600;color:var(--faint)}
+.frame code{font:500 11px var(--mono);color:var(--line-2)}
+.foot{position:absolute;left:28px;bottom:26px;font:500 10px var(--mono);color:var(--line-2);letter-spacing:.04em}
+#img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;z-index:5;background:#fff}
+#app.has-img #img{display:block;animation:in .4s var(--ease)}
+@keyframes in{from{opacity:0}to{opacity:1}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr"><span class="mk"></span><div><b>WATARI</b><small>CFO agent</small></div></div>
+  <div class="lbl" id="lbl">Slide 1</div>
+  <div class="frame"><div><span class="ghost"></span><p id="ph">Slide 1 · content follows</p><code id="hint">drop app/slides/slide-1.png</code></div></div>
+  <div class="foot">KBC hackathon · 2026</div>
+  <img id="img" alt="">
+</div>
+<script>
+const APP=document.getElementById('app');
+function fit(){const s=Math.min(innerWidth/1600,innerHeight/940);APP.style.transform=`translate(-50%,-50%) scale(${s})`;}
+addEventListener('resize',fit);fit();
+
+const n=Math.max(1,parseInt(new URLSearchParams(location.search).get('n'),10)||1);
+document.title='WATARI · Slide '+n;
+document.getElementById('lbl').textContent='Slide '+n;
+document.getElementById('ph').textContent='Slide '+n+' · content follows';
+document.getElementById('hint').textContent='drop app/slides/slide-'+n+'.png';
+
+/* slides/slide-n.png replaces the placeholder full-bleed when it exists (a 404 just keeps the placeholder) */
+const img=document.getElementById('img');
+img.onload=()=>APP.classList.add('has-img');
+img.onerror=()=>img.remove();
+img.alt='Slide '+n;img.src='slides/slide-'+n+'.png';
+</script>
+<script src="/app/bridge.js"></script>
+</body>
+</html>

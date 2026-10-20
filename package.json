@@ -6,12 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:rt": "node --test tests/stt-core.test.cjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.130.0",
     "@neondatabase/serverless": "^1.1.0",
     "next": "15.5.27",
+    "peerjs": "^1.5.5",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "zod": "^4.6.5"

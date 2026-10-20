@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Watari · Cover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#121214;--ink:#fff;--mute:rgba(255,255,255,.62);--faint:rgba(255,255,255,.38);--line:rgba(255,255,255,.14);--cyan:#00aeef}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0b0b0d;overflow:hidden}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink)}
+#slide{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center;overflow:hidden;
+  background:radial-gradient(1100px 760px at 50% 47%,#26282d 0%,#18191c 45%,#111113 100%)}
+/* glossy floor, a nod to the metallic shelf */
+.floor{position:absolute;left:-10%;right:-10%;top:742px;height:420px;
+  background:linear-gradient(180deg,rgba(255,255,255,.075) 0%,rgba(255,255,255,.02) 22%,rgba(0,0,0,0) 60%);
+  transform:perspective(900px) rotateX(58deg);transform-origin:top center}
+.floor::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22) 30%,rgba(255,255,255,.3) 50%,rgba(255,255,255,.22) 70%,transparent)}
+.floor::after{content:"";position:absolute;inset:0;background:radial-gradient(420px 120px at 50% 6%,rgba(0,174,239,.22),transparent 70%)}
+.brand{position:absolute;left:72px;top:58px;display:flex;align-items:center;gap:14px;font-weight:700;letter-spacing:.22em;font-size:17px}
+.brand i{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle,#fff 0 14%,#7fd8ff 38%,#1e8bff 72%,#1f5fe0 100%);box-shadow:0 0 18px rgba(0,174,239,.55)}
+.tag{position:absolute;right:72px;top:56px;height:38px;padding:0 18px;border-radius:999px;border:1px solid var(--line);display:flex;align-items:center;font-size:15px;color:var(--mute);font-weight:500}
+h1{position:absolute;left:0;right:0;top:120px;text-align:center;font-size:132px;font-weight:600;letter-spacing:-.045em;line-height:1}
+#orb{position:absolute;left:50%;top:268px;width:620px;height:620px;transform:translateX(-50%)}
+.lead{position:absolute;left:0;right:0;top:850px;text-align:center;font-size:36px;font-weight:500;letter-spacing:-.015em;color:#fff}
+.uses{position:absolute;left:0;right:0;top:948px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding:0 80px}
+.uses span{height:42px;padding:0 20px;border-radius:999px;border:1px solid var(--line);display:flex;align-items:center;font-size:17px;font-weight:500;color:var(--mute);background:rgba(255,255,255,.02);
+  opacity:0;transform:translateY(8px);animation:in .7s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes in{to{opacity:1;transform:none}}
+h1,.lead{opacity:0;animation:in 1s cubic-bezier(.2,.8,.2,1) forwards}
+h1{animation-delay:.1s}.lead{animation-delay:.5s}
+.pg{position:absolute;right:72px;bottom:44px;font-size:13px;color:var(--faint);letter-spacing:.08em}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;opacity:1!important;transform:none}}
+</style></head>
+<body>
+<div id="slide">
+  <div class="floor"></div>
+  <div class="brand"><i></i>WATARI</div>
+  
+  <h1>Watari</h1>
+  <canvas id="orb"></canvas>
+  <p class="lead">An AI-powered CFO for startups and growing businesses.</p>
+  <div class="uses" id="uses"></div>
+  <div class="pg">01</div>
+</div>
+<script>
+const S=document.getElementById('slide');
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);S.style.transform=`translate(-50%,-50%) scale(${s})`;}
+addEventListener('resize',fit);fit();
+['Cash flow monitoring','Expense analysis','Financial forecasting','Fraud detection','Revenue tracking','Investor reporting','Runway planning','Risk alerts']
+  .forEach((t,i)=>{const e=document.createElement('span');e.textContent=t;e.style.animationDelay=(.8+i*.07)+'s';document.getElementById('uses').appendChild(e);});
+
+/* WATARI orb: blue and white bubbles, rotating sphere + orbit rings + reflection */
+const cv=document.getElementById('orb'),c=cv.getContext('2d'),W=620,H=620,D=2;cv.width=W*D;cv.height=H*D;
+const N=760,P=[];for(let i=0;i<N;i++){const y=1-(i+.5)/N*2,r=Math.sqrt(1-y*y),th=i*2.399963;P.push([Math.cos(th)*r,y,Math.sin(th)*r,.5+((i*7919)%100)/100*.9,(i*104729)%9===0]);}
+const RINGS=[{rx:1.42,ry:.34,tilt:-.32,sp:.00042,n:3},{rx:1.62,ry:.42,tilt:.22,sp:-.0003,n:2}];
+let rot=0,t0=performance.now();
+function ball(x,y,r,h,l,a,white){const g=c.createRadialGradient(x-r*.35,y-r*.35,r*.08,x,y,r);
+  g.addColorStop(0,`hsla(${h},100%,${Math.min(98,l+28)}%,${a})`);g.addColorStop(1,`hsla(${h},${white?50:95}%,${l}%,${a})`);c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,7);c.fill();}
+function draw(now){const t=(now-t0)/1000;c.setTransform(D,0,0,D,0,0);c.clearRect(0,0,W,H);
+  const X=W/2,Y=H/2-20,R=150*(1+Math.sin(t*1.1)*.015);rot+=.0042;
+  // halo
+  let g=c.createRadialGradient(X,Y,0,X,Y,R*2.1);g.addColorStop(0,'rgba(120,215,255,.55)');g.addColorStop(.35,'rgba(0,150,255,.18)');g.addColorStop(1,'rgba(0,120,255,0)');c.fillStyle=g;c.beginPath();c.arc(X,Y,R*2.1,0,7);c.fill();
+  // back half of rings
+  ringPass(X,Y,R,t,false);
+  const cr=Math.cos(rot),sr=Math.sin(rot),ct=Math.cos(.38),st=Math.sin(.38);
+  const Q=P.map(([x,y,z,s,w])=>{const x1=x*cr-z*sr,z1=x*sr+z*cr;return[x1,y*ct-z1*st,y*st+z1*ct,s,w];}).sort((a,b)=>a[2]-b[2]);
+  c.globalCompositeOperation='lighter';
+  for(const[x,y,z,s,w]of Q){const d=(z+1)/2,e=Math.hypot(x,y),r=(1.2+d*2.9)*s*(R/130);
+    ball(X+x*R,Y+y*R,r,w?196:208+e*16,w?92:58-e*14+d*8,.22+d*.7,w);}
+  c.globalCompositeOperation='source-over';
+  g=c.createRadialGradient(X,Y,0,X,Y,R*.55);g.addColorStop(0,'rgba(255,255,255,.95)');g.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=g;c.beginPath();c.arc(X,Y,R*.55,0,7);c.fill();
+  ringPass(X,Y,R,t,true);
+  // reflection on the floor
+  c.save();c.translate(0,Y*2+R*1.55);c.scale(1,-.32);c.globalAlpha=.18;
+  g=c.createRadialGradient(X,Y,0,X,Y,R*1.1);g.addColorStop(0,'rgba(140,220,255,.9)');g.addColorStop(1,'rgba(0,140,255,0)');c.fillStyle=g;c.beginPath();c.arc(X,Y,R*1.1,0,7);c.fill();c.restore();
+  requestAnimationFrame(draw);}
+function ringPass(X,Y,R,t,front){for(const rg of RINGS){c.save();c.translate(X,Y);c.rotate(rg.tilt);
+  c.strokeStyle='rgba(160,220,255,.22)';c.lineWidth=1;c.setLineDash([2,7]);c.beginPath();
+  c.ellipse(0,0,R*rg.rx,R*rg.ry,0,front?0:Math.PI,front?Math.PI:Math.PI*2);c.stroke();c.setLineDash([]);
+  for(let k=0;k<rg.n;k++){const a=(t*rg.sp*1000+k*2*Math.PI/rg.n)%(2*Math.PI),py=Math.sin(a);if((py>0)!==front)continue;
+    const x=Math.cos(a)*R*rg.rx,y=py*R*rg.ry;const gg=c.createRadialGradient(x,y,0,x,y,9);gg.addColorStop(0,'rgba(255,255,255,1)');gg.addColorStop(.35,'rgba(120,215,255,.9)');gg.addColorStop(1,'rgba(0,174,239,0)');
+    c.fillStyle=gg;c.beginPath();c.arc(x,y,9,0,7);c.fill();}
+  c.restore();}}
+requestAnimationFrame(draw);
+</script><script src="/app/bridge.js"></script></body></html>
