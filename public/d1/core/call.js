@@ -31,10 +31,11 @@ W.PARTNERS={
   calendar:{name:'Calendar', role:'Your agenda · free slots', color:'#ffffff', fg:'#0f6cbd', mark:'31', proto:'API'},
   colruyt:{name:C.client.name, role:'Client · owes '+'€31.000', color:C.client.color, fg:'#fff', mark:'C', proto:'WEB'},
 };
-W.logo=(id,size=34)=>{ const p=W.PARTNERS[id]||{name:id,color:'#ccd',fg:'#123',mark:id.slice(0,2)};
-  return `<span class="wlogo" style="--lg:${p.color};--lf:${p.fg};width:${size}px;height:${size}px;font-size:${Math.round(size*.36)}px" title="${p.name}">${W.LOGOS?`<img src="${W.base}logos/${id}.svg" alt="" onerror="this.remove()">`:''}<b>${p.mark}</b></span>`; };
-W.LOGOS=qs.get('logos')==='1'; // drop official SVGs in core/logos/ then open with ?logos=1
+W.LOGO_FILES={kbc:'kbc.svg',sdworx:'sdworx.svg',attio:'attio.svg',peppol:'peppol.png',outlook:'outlook.svg',calendar:'calendar.svg',colruyt:'colruyt.svg'};
+W.LOGOS=qs.get('logos')!=='0'; // official logos from core/logos/ (?logos=0 = text marks only)
 W.base=(document.currentScript&&document.currentScript.src.replace(/call\.js.*$/,''))||'core/';
+W.logo=(id,size=34)=>{ const p=W.PARTNERS[id]||{name:id,color:'#ccd',fg:'#123',mark:id.slice(0,2)}; const f=W.LOGOS&&W.LOGO_FILES[id];
+  return `<span class="wlogo${f?' has-img':''}" style="--lg:${p.color};--lf:${p.fg};width:${size}px;height:${size}px;font-size:${Math.round(size*.36)}px" title="${p.name}">${f?`<img src="${W.base}logos/${f}" alt="" onerror="this.parentNode.classList.remove('has-img');this.remove()">`:''}<b>${p.mark}</b></span>`; };
 
 /* ---------------- bus ----------------
    Every message has a unique id (mid) and the sender role. Transports: BroadcastChannel (same browser, ?nobc=1 to
